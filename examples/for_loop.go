@@ -157,7 +157,6 @@ func partition(slice []int, left int, right int) int {
 	}
 }
 
-// [6, 4, 7, 0, 1, 2, 3, 9, 5, 8]
 func quickSort(slice []int, left int, right int) {
 	if left < right {
 		p := partition(slice, left, right)

@@ -4,40 +4,90 @@ import (
 	"math/rand"
 	gosort "sort"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestSorter(t *testing.T) {
-	nums1 := rand.Perm(2056)
-	nums2 := make([]int, len(nums1))
-	copy(nums2, nums1)
+	t.Parallel()
 
-	cases := []struct {
+	tests := []struct {
 		name   string
 		sorter Sorter[int]
-		items  []int
 	}{
 		{
 			name:   "Select",
 			sorter: NewSelectSorter[int](),
-			items:  nums1,
 		},
 		{
 			name:   "Insert",
 			sorter: NewInsertSorter[int](),
-			items:  nums2,
 		},
 		{
 			name:   "Shell",
 			sorter: NewShellSorter[int](),
-			items:  nums2,
+		},
+		{
+			name:   "Bubble",
+			sorter: NewBubbleSorter[int](),
+		},
+		{
+			name:   "Quick",
+			sorter: NewQuickSorter[int](),
 		},
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			c.sorter.Sort(c.items)
-			isSorted := gosort.IsSorted(gosort.IntSlice(c.items))
-			if !isSorted {
-				t.Errorf("%v is not sorted", c.items)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			items := rand.Perm(1 << 8)
+
+			rand.Shuffle(len(items), func(i, j int) {
+				items[i], items[j] = items[j], items[i]
+			})
+
+			tt.sorter.Sort(items)
+
+			require.True(t, gosort.IsSorted(gosort.IntSlice(items)))
+		})
+	}
+}
+
+func BenchmarkSorter(b *testing.B) {
+	tests := []struct {
+		name   string
+		sorter Sorter[int]
+	}{
+		{
+			name:   "Select",
+			sorter: NewSelectSorter[int](),
+		},
+		{
+			name:   "Insert",
+			sorter: NewInsertSorter[int](),
+		},
+		{
+			name:   "Shell",
+			sorter: NewShellSorter[int](),
+		},
+		{
+			name:   "Bubble",
+			sorter: NewBubbleSorter[int](),
+		},
+		{
+			name:   "Quick",
+			sorter: NewQuickSorter[int](),
+		},
+	}
+
+	for _, tt := range tests {
+		b.Run(tt.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				b.StopTimer()
+				items := rand.Perm(1 << 8)
+
+				b.StartTimer()
+				tt.sorter.Sort(items)
 			}
 		})
 	}
