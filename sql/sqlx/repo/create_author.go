@@ -5,26 +5,68 @@ import (
 	"fmt"
 	"sandbox/sql/entities"
 	"sandbox/sql/sqlx/models"
-	"strings"
+	"sandbox/utils"
 
-	"github.com/huandu/go-sqlbuilder"
+	sb "github.com/huandu/go-sqlbuilder"
 )
 
-func (r *repo) CreateAuthor(ctx context.Context, entity entities.Author) (entities.Author, error) {
-	b := sqlbuilder.InsertInto(models.AuthorMeta.TableName)
-	b.Cols(models.AuthorMeta.Columns.Name)
-	b.Values(entity.Name)
-	b.SQL(fmt.Sprintf("RETURNING %s", strings.Join(models.AuthorMeta.Columns.All(), ", ")))
+func (r *repo) CreateAuthors(ctx context.Context, items []entities.Author) ([]entities.Author, error) {
+	query, args := r.createAuthorsQuery(r.authorToModelMany(items))
 
-	query, args := b.Build()
-
-	var model models.Author
-	if err := r.db.GetContext(ctx, &model, query, args...); err != nil {
-		return entities.Author{}, fmt.Errorf("r.db.GetContext: %w", err)
+	var result []models.Author
+	if err := r.db.SelectContext(ctx, &result, query, args...); err != nil {
+		return nil, fmt.Errorf("r.db.SelectContext: %w", err)
 	}
 
+	return r.authorToEntityMany(result), nil
+}
+
+func (r *repo) CreateAuthor(ctx context.Context, item entities.Author) (entities.Author, error) {
+	result, err := r.CreateAuthors(ctx, []entities.Author{item})
+	if err != nil {
+		return entities.Author{}, fmt.Errorf("r.CreateAuthors: %w", err)
+	}
+	return result[0], nil
+}
+
+func (r *repo) createAuthorsQuery(items []models.Author) (sql string, args []interface{}) {
+	meta := models.AuthorMeta
+
+	b := sb.InsertInto(meta.TableName)
+	b.Cols(meta.Columns.Name)
+
+	for _, v := range items {
+		b.Values(v.Name)
+	}
+
+	b.SQL(returning(
+		meta.Columns.ID,
+		meta.Columns.Name,
+	))
+
+	query, args := b.Build()
+	return query, args
+}
+
+/* mapping */
+
+func (r *repo) authorToEntity(m models.Author) entities.Author {
 	return entities.Author{
-		ID:   model.ID,
-		Name: model.Name,
-	}, nil
+		ID:   m.ID,
+		Name: m.Name,
+	}
+}
+
+func (r *repo) authorToEntityMany(slice []models.Author) []entities.Author {
+	return utils.Map(slice, r.authorToEntity)
+}
+
+func (r *repo) authorToModel(e entities.Author) models.Author {
+	return models.Author{
+		Name: e.Name,
+	}
+}
+
+func (r *repo) authorToModelMany(slice []entities.Author) []models.Author {
+	return utils.Map(slice, r.authorToModel)
 }

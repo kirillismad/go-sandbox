@@ -33,7 +33,7 @@ func TestPipelineFuncOk(t *testing.T) {
 	for e := range pipe {
 		result = append(result, e)
 	}
-	if slices.Compare(result, utils.SliceMap(s, pow2)) != 0 {
+	if slices.Compare(result, utils.Map(s, pow2)) != 0 {
 		t.Errorf("s: %v, result: %v", s, result)
 	}
 }

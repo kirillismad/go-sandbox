@@ -10,18 +10,6 @@ type AuthorColumns struct {
 	Name string
 }
 
-func (c AuthorColumns) All() []string {
-	return []string{
-		c.ID,
-		c.Name,
-	}
-}
-
-type TableMetadata[ColsT any] struct {
-	TableName string
-	Columns   ColsT
-}
-
 var AuthorMeta = TableMetadata[AuthorColumns]{
 	TableName: "authors",
 	Columns: AuthorColumns{

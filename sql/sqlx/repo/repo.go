@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"sandbox/sql/entities"
+	"strings"
 
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/jmoiron/sqlx"
@@ -14,9 +15,13 @@ func init() {
 	sqlbuilder.DefaultFlavor = sqlbuilder.PostgreSQL
 }
 
+func returning(col ...string) string {
+	return fmt.Sprintf("RETURNING %s", strings.Join(col, ", "))
+}
+
 type RepoHandler interface {
 	GetRepo() Repo
-	InTrasaction(ctx context.Context, funcTx func(repo Repo) error) error
+	InTrasaction(funcTx func(repo Repo) error) error
 }
 
 type Repo interface {
@@ -35,8 +40,9 @@ func (h *repoHandler) GetRepo() Repo {
 	return newRepo(h.db)
 }
 
-func (h *repoHandler) InTrasaction(ctx context.Context, funcTx func(r Repo) error) error {
+func (h *repoHandler) InTrasaction(funcTx func(r Repo) error) error {
 	tx, err := h.db.Beginx()
+
 	if err != nil {
 		return fmt.Errorf("db.Beginx: %w", err)
 	}

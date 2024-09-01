@@ -1,32 +1,74 @@
 package repo
 
 import (
-	"context"
+	"math/rand/v2"
 	"sandbox/sql/entities"
 	"sandbox/sql/sqlx/models"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/jmoiron/sqlx"
-	"github.com/stretchr/testify/require"
+	"github.com/samber/lo"
 )
 
 func TestCreateAuthor(t *testing.T) {
 	t.Parallel()
 
-	r := require.New(t)
+	const query = `INSERT INTO authors (name) VALUES ($1) RETURNING id, name`
+	genEntity := func() (int64, entities.Author) {
+		entity := entities.Author{
+			Name: lo.RandomString(8, lo.LettersCharset),
+		}
+		ID := rand.Int64()
+		return ID, entity
+	}
 
-	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	r.NoError(err)
+	meta := models.AuthorMeta
 
-	q := mock.ExpectQuery(`INSERT INTO authors (name) VALUES ($1) RETURNING id, name`)
-	q.WithArgs("John Doe")
-	q.WillReturnRows(sqlmock.NewRows(models.AuthorMeta.Columns.All()).AddRow(1, "John Doe"))
+	t.Run("success: no tx", func(t *testing.T) {
+		t.Parallel()
 
-	repo := newRepo(sqlx.NewDb(db, "pgx"))
+		r, repoHandler, mock := initTest(t)
 
-	entity, err := repo.CreateAuthor(context.Background(), entities.Author{Name: "John Doe"})
-	r.NoError(err)
-	r.Equal(entities.Author{ID: 1, Name: "John Doe"}, entity)
+		// arrange
+		ID, entity := genEntity()
+
+		q := mock.ExpectQuery(query)
+		q.WithArgs(entity.Name)
+		q.WillReturnRows(sqlmock.NewRows([]string{meta.Columns.ID, meta.Columns.Name}).AddRow(ID, entity.Name))
+
+		//act
+		result, err := repoHandler.GetRepo().CreateAuthor(getctx(), entity)
+
+		// assert
+		r.NoError(err)
+		r.Equal(entities.Author{ID: ID, Name: entity.Name}, result)
+	})
+
+	t.Run("success: in tx", func(t *testing.T) {
+		t.Parallel()
+
+		r, repoHandler, mock := initTest(t)
+
+		// arrange
+		ID, entity := genEntity()
+
+		mock.ExpectBegin()
+		q := mock.ExpectQuery(query)
+		q.WithArgs(entity.Name)
+		q.WillReturnRows(sqlmock.NewRows([]string{meta.Columns.ID, meta.Columns.Name}).AddRow(ID, entity.Name))
+		mock.ExpectCommit()
+
+		//act
+		var result entities.Author
+		err := repoHandler.InTrasaction(func(repo Repo) error {
+			var errTx error
+			result, errTx = repo.CreateAuthor(getctx(), entity)
+			return errTx
+		})
+
+		// assert
+		r.NoError(err)
+		r.Equal(entities.Author{ID: ID, Name: entity.Name}, result)
+	})
 }
