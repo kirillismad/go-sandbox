@@ -30,18 +30,16 @@ func (r *repo) CreateAuthor(ctx context.Context, item entities.Author) (entities
 }
 
 func (r *repo) createAuthorsQuery(items []models.Author) (sql string, args []interface{}) {
-	meta := models.AuthorMeta
-
-	b := sb.InsertInto(meta.TableName)
-	b.Cols(meta.Columns.Name)
+	b := sb.InsertInto(models.AuthorsTable)
+	b.Cols(models.AuthorsColName)
 
 	for _, v := range items {
 		b.Values(v.Name)
 	}
 
 	b.SQL(returning(
-		meta.Columns.ID,
-		meta.Columns.Name,
+		prfx(models.AuthorsTable, models.AuthorsColID),
+		prfx(models.AuthorsTable, models.AuthorsColName),
 	))
 
 	query, args := b.Build()
@@ -63,6 +61,7 @@ func (r *repo) authorToEntityMany(slice []models.Author) []entities.Author {
 
 func (r *repo) authorToModel(e entities.Author) models.Author {
 	return models.Author{
+		ID:   e.ID,
 		Name: e.Name,
 	}
 }

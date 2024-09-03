@@ -14,7 +14,7 @@ import (
 func TestCreateAuthor(t *testing.T) {
 	t.Parallel()
 
-	const query = `INSERT INTO authors (name) VALUES ($1) RETURNING id, name`
+	const query = `INSERT INTO authors (name) VALUES ($1) RETURNING authors.id, authors.name`
 	genEntity := func() (int64, entities.Author) {
 		entity := entities.Author{
 			Name: lo.RandomString(8, lo.LettersCharset),
@@ -22,8 +22,6 @@ func TestCreateAuthor(t *testing.T) {
 		ID := rand.Int64()
 		return ID, entity
 	}
-
-	meta := models.AuthorMeta
 
 	t.Run("success: no tx", func(t *testing.T) {
 		t.Parallel()
@@ -35,7 +33,12 @@ func TestCreateAuthor(t *testing.T) {
 
 		q := mock.ExpectQuery(query)
 		q.WithArgs(entity.Name)
-		q.WillReturnRows(sqlmock.NewRows([]string{meta.Columns.ID, meta.Columns.Name}).AddRow(ID, entity.Name))
+		q.WillReturnRows(
+			sqlmock.NewRows([]string{
+				prfx(models.AuthorsTable, models.AuthorsColID),
+				prfx(models.AuthorsTable, models.AuthorsColName),
+			}).AddRow(ID, entity.Name),
+		)
 
 		//act
 		result, err := repoHandler.GetRepo().CreateAuthor(getctx(), entity)
@@ -56,7 +59,12 @@ func TestCreateAuthor(t *testing.T) {
 		mock.ExpectBegin()
 		q := mock.ExpectQuery(query)
 		q.WithArgs(entity.Name)
-		q.WillReturnRows(sqlmock.NewRows([]string{meta.Columns.ID, meta.Columns.Name}).AddRow(ID, entity.Name))
+		q.WillReturnRows(
+			sqlmock.NewRows([]string{
+				prfx(models.AuthorsTable, models.AuthorsColID),
+				prfx(models.AuthorsTable, models.AuthorsColName),
+			}).AddRow(ID, entity.Name),
+		)
 		mock.ExpectCommit()
 
 		//act

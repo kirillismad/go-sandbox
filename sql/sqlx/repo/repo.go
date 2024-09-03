@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"sandbox/sql/entities"
-	"strings"
 
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/jmoiron/sqlx"
@@ -13,10 +12,6 @@ import (
 
 func init() {
 	sqlbuilder.DefaultFlavor = sqlbuilder.PostgreSQL
-}
-
-func returning(col ...string) string {
-	return fmt.Sprintf("RETURNING %s", strings.Join(col, ", "))
 }
 
 type RepoHandler interface {
