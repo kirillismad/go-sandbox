@@ -24,10 +24,6 @@ func (r *repo) ListAuthor(ctx context.Context) ([]entities.Author, error) {
 		return nil, fmt.Errorf("r.db.SelectContext: %w", err)
 	}
 
-	idList := utils.Map(result, func(item models.Author) interface{} {
-		return item.ID
-	})
-
 	b = sb.Select(
 		prfx(models.BookAuthorTable, models.BookAuthorColAuthorID),
 		prfx(models.BookTable, models.BookColID),
@@ -58,10 +54,12 @@ func (r *repo) ListAuthor(ctx context.Context) ([]entities.Author, error) {
 			prfx(models.PublisherTable, models.PublisherColID),
 		),
 	)
-	b.Where(b.Any(
+	b.Where(b.In(
 		prfx(models.BookAuthorTable, models.BookAuthorColID),
-		"=",
-		idList...,
+		utils.Map(result, func(item models.Author) interface{} {
+			return item.ID
+		},
+		)...,
 	))
 
 	query, args = b.Build()

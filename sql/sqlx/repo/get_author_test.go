@@ -22,7 +22,7 @@ func Test_repo_ListAuthor(t *testing.T) {
 	FROM books 
 	INNER JOIN books_authors ON books_authors.book_id = books.id 
 	LEFT JOIN publishers ON books.publisher_id = publishers.id 
-	WHERE books_authors.id = ANY ($1, $2)
+	WHERE books_authors.id IN ($1, $2)
 	`
 
 	t.Run("success", func(t *testing.T) {

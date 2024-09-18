@@ -20,7 +20,7 @@ type RepoHandler interface {
 }
 
 type Repo interface {
-	CreateAuthor(ctx context.Context, entity entities.Author) (entities.Author, error)
+	CreateAuthors(ctx context.Context, entity []entities.Author) ([]entities.Author, error)
 	ListAuthor(ctx context.Context) ([]entities.Author, error)
 }
 

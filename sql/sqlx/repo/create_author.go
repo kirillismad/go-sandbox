@@ -13,20 +13,20 @@ import (
 func (r *repo) CreateAuthors(ctx context.Context, items []entities.Author) ([]entities.Author, error) {
 	query, args := r.createAuthorsQuery(r.authorToModelMany(items))
 
-	var result []models.Author
-	if err := r.db.SelectContext(ctx, &result, query, args...); err != nil {
-		return nil, fmt.Errorf("r.db.SelectContext: %w", err)
+	result, err := r.doQuery(ctx, query, args)
+	if err != nil {
+		return nil, err
 	}
 
 	return r.authorToEntityMany(result), nil
 }
 
-func (r *repo) CreateAuthor(ctx context.Context, item entities.Author) (entities.Author, error) {
-	result, err := r.CreateAuthors(ctx, []entities.Author{item})
-	if err != nil {
-		return entities.Author{}, fmt.Errorf("r.CreateAuthors: %w", err)
+func (r *repo) doQuery(ctx context.Context, query string, args []interface{}) ([]models.Author, error) {
+	var result []models.Author
+	if err := r.db.SelectContext(ctx, &result, query, args...); err != nil {
+		return nil, fmt.Errorf("r.db.SelectContext: %w", err)
 	}
-	return result[0], nil
+	return result, nil
 }
 
 func (r *repo) createAuthorsQuery(items []models.Author) (sql string, args []interface{}) {

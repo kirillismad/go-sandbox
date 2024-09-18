@@ -11,7 +11,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func TestCreateAuthor(t *testing.T) {
+func TestCreateAuthors(t *testing.T) {
 	t.Parallel()
 
 	const query = `INSERT INTO authors (name) VALUES ($1) RETURNING authors.id, authors.name`
@@ -41,11 +41,11 @@ func TestCreateAuthor(t *testing.T) {
 		)
 
 		//act
-		result, err := repoHandler.GetRepo().CreateAuthor(getctx(), entity)
+		result, err := repoHandler.GetRepo().CreateAuthors(getctx(), []entities.Author{entity})
 
 		// assert
 		r.NoError(err)
-		r.Equal(entities.Author{ID: ID, Name: entity.Name}, result)
+		r.Equal([]entities.Author{{ID: ID, Name: entity.Name}}, result)
 	})
 
 	t.Run("success: in tx", func(t *testing.T) {
@@ -68,15 +68,15 @@ func TestCreateAuthor(t *testing.T) {
 		mock.ExpectCommit()
 
 		//act
-		var result entities.Author
+		var result []entities.Author
 		err := repoHandler.InTrasaction(func(repo Repo) error {
 			var errTx error
-			result, errTx = repo.CreateAuthor(getctx(), entity)
+			result, errTx = repo.CreateAuthors(getctx(), []entities.Author{entity})
 			return errTx
 		})
 
 		// assert
 		r.NoError(err)
-		r.Equal(entities.Author{ID: ID, Name: entity.Name}, result)
+		r.Equal([]entities.Author{{ID: ID, Name: entity.Name}}, result)
 	})
 }
