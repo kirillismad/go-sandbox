@@ -15,6 +15,9 @@ func initTest(t *testing.T) (*require.Assertions, RepoHandler, sqlmock.Sqlmock) 
 
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	r.NoError(err)
+	t.Cleanup(func() {
+		db.Close()
+	})
 
 	repoHandler := NewRepoHandler(sqlx.NewDb(db, "pgx"))
 

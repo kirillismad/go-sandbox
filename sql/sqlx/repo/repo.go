@@ -21,6 +21,7 @@ type RepoHandler interface {
 
 type Repo interface {
 	CreateAuthor(ctx context.Context, entity entities.Author) (entities.Author, error)
+	ListAuthor(ctx context.Context) ([]entities.Author, error)
 }
 
 type repoHandler struct {
@@ -58,6 +59,7 @@ type DBTX interface {
 	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 	SelectContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+	Queryx(query string, args ...interface{}) (*sqlx.Rows, error)
 }
 
 type repo struct {
