@@ -9,20 +9,16 @@ import (
 	sb "github.com/huandu/go-sqlbuilder"
 )
 
-type GetAuthorParams struct {
-	ID int64
-}
+func (r *repo) UpdateAuthor(ctx context.Context, item entities.Author) (entities.Author, error) {
+	m := r.authorToModel(item)
 
-func (r *repo) GetAuthor(ctx context.Context, params GetAuthorParams) (entities.Author, error) {
-	b := sb.Select(
+	b := sb.Update(models.AuthorsTable)
+	b.Set(b.Assign(models.AuthorsColName, m.Name))
+	b.Where(b.EQ(models.AuthorsColID, m.ID))
+	b.SQL(returning(
 		prfx(models.AuthorsTable, models.AuthorsColID),
 		prfx(models.AuthorsTable, models.AuthorsColName),
-	)
-	b.From(models.AuthorsTable)
-
-	if params.ID != 0 {
-		b.Where(b.EQ(prfx(models.AuthorsTable, models.AuthorsColID), params.ID))
-	}
+	))
 
 	query, args := b.Build()
 
@@ -30,6 +26,5 @@ func (r *repo) GetAuthor(ctx context.Context, params GetAuthorParams) (entities.
 	if err := r.db.GetContext(ctx, &result, query, args...); err != nil {
 		return entities.Author{}, fmt.Errorf("r.db.GetContext: %w", err)
 	}
-
 	return r.authorToEntity(result), nil
 }

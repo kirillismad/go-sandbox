@@ -2,48 +2,47 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"sandbox/sql/entities"
+	"sandbox/sql/sqlx/mapper"
 	"sandbox/sql/sqlx/models"
 	"sandbox/utils"
 
 	sb "github.com/huandu/go-sqlbuilder"
 )
 
-func (r *repo) CreateAuthors(ctx context.Context, items []entities.Author) ([]entities.Author, error) {
-	query, args := r.createAuthorsQuery(r.authorToModelMany(items))
-
-	result, err := r.doQuery(ctx, query, args)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.authorToEntityMany(result), nil
+type authorCreator struct {
+	mapper mapper.Mapper
 }
 
-func (r *repo) doQuery(ctx context.Context, query string, args []interface{}) ([]models.Author, error) {
-	var result []models.Author
-	if err := r.db.SelectContext(ctx, &result, query, args...); err != nil {
-		return nil, fmt.Errorf("r.db.SelectContext: %w", err)
-	}
-	return result, nil
+func (b *authorCreator) MapToE(item models.Author) entities.Author {
+	return b.mapper.AuthorToEntity(item)
 }
 
-func (r *repo) createAuthorsQuery(items []models.Author) (sql string, args []interface{}) {
-	b := sb.InsertInto(models.AuthorsTable)
-	b.Cols(models.AuthorsColName)
+func (b *authorCreator) MapToM(item entities.Author) models.Author {
+	return b.mapper.AuthorToModel(item)
+}
 
-	for _, v := range items {
-		b.Values(v.Name)
-	}
+func (b *authorCreator) Query(in models.Author) (string, []interface{}) {
+	builder := sb.InsertInto(models.AuthorsTable)
+	builder.Cols(models.AuthorsColName)
 
-	b.SQL(returning(
+	builder.Values(in.Name)
+
+	builder.SQL(returning(
 		prfx(models.AuthorsTable, models.AuthorsColID),
 		prfx(models.AuthorsTable, models.AuthorsColName),
 	))
 
-	query, args := b.Build()
+	query, args := builder.Build()
 	return query, args
+}
+
+func (r *repo) CreateAuthor(ctx context.Context, item entities.Author) (entities.Author, error) {
+	t := NewCreator(
+		&authorCreator{mapper: r.mapper},
+		r.db,
+	)
+	return t.Create(ctx, item)
 }
 
 /* mapping */

@@ -41,11 +41,11 @@ func TestCreateAuthors(t *testing.T) {
 		)
 
 		//act
-		result, err := repoHandler.GetRepo().CreateAuthors(getctx(), []entities.Author{entity})
+		result, err := repoHandler.GetRepo().CreateAuthor(getctx(), entity)
 
 		// assert
 		r.NoError(err)
-		r.Equal([]entities.Author{{ID: ID, Name: entity.Name}}, result)
+		r.Equal(entities.Author{ID: ID, Name: entity.Name}, result)
 	})
 
 	t.Run("success: in tx", func(t *testing.T) {
@@ -68,15 +68,15 @@ func TestCreateAuthors(t *testing.T) {
 		mock.ExpectCommit()
 
 		//act
-		var result []entities.Author
+		var result entities.Author
 		err := repoHandler.InTrasaction(func(repo Repo) error {
 			var errTx error
-			result, errTx = repo.CreateAuthors(getctx(), []entities.Author{entity})
+			result, errTx = repo.CreateAuthor(getctx(), entity)
 			return errTx
 		})
 
 		// assert
 		r.NoError(err)
-		r.Equal([]entities.Author{{ID: ID, Name: entity.Name}}, result)
+		r.Equal(entities.Author{ID: ID, Name: entity.Name}, result)
 	})
 }
