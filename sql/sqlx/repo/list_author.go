@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"sandbox/sql/entities"
 	"sandbox/sql/sqlx/models"
+	"sandbox/utils"
 
 	sb "github.com/huandu/go-sqlbuilder"
+	"github.com/samber/lo"
 )
 
 type ListAuthorParams struct {
@@ -16,25 +18,16 @@ type ListAuthorParams struct {
 }
 
 func (r *repo) ListAuthor(ctx context.Context, params ListAuthorParams) ([]entities.Author, error) {
-	query, args := r.listAuthorQuery(params)
+	prfx := lo.Partial(prefix, models.AuthorsTable)
 
-	var result []models.Author
-	if err := r.db.SelectContext(ctx, &result, query, args...); err != nil {
-		return nil, fmt.Errorf("r.db.SelectContext: %w", err)
-	}
-
-	return r.authorToEntityMany(result), nil
-}
-
-func (*repo) listAuthorQuery(params ListAuthorParams) (string, []interface{}) {
 	b := sb.Select(
-		prfx(models.AuthorsTable, models.AuthorsColID),
-		prfx(models.AuthorsTable, models.AuthorsColName),
+		prfx(models.AuthorsColID),
+		prfx(models.AuthorsColName),
 	)
 	b.From(models.AuthorsTable)
 
 	if params.NameLike != "" {
-		b.Where(b.Like(prfx(models.AuthorsTable, models.AuthorsColName), params.NameLike))
+		b.Where(b.Like(prfx(models.AuthorsColName), params.NameLike))
 	}
 
 	if params.Limit != 0 {
@@ -46,5 +39,11 @@ func (*repo) listAuthorQuery(params ListAuthorParams) (string, []interface{}) {
 	}
 
 	query, args := b.Build()
-	return query, args
+
+	var result []models.Author
+	if err := r.db.SelectContext(ctx, &result, query, args...); err != nil {
+		return nil, fmt.Errorf("r.db.SelectContext: %w", err)
+	}
+
+	return utils.Map(result, r.mapper.AuthorToEntity), nil
 }

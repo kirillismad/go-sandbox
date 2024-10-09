@@ -10,7 +10,7 @@ import (
 )
 
 func (r *repo) DeleteAuthor(ctx context.Context, item entities.Author) error {
-	m := r.authorToModel(item)
+	m := r.mapper.AuthorToModel(item)
 
 	b := sb.DeleteFrom(models.AuthorsTable)
 	b.Where(b.EQ(models.AuthorsColID, m.ID))

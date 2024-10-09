@@ -35,8 +35,8 @@ func TestCreateAuthors(t *testing.T) {
 		q.WithArgs(entity.Name)
 		q.WillReturnRows(
 			sqlmock.NewRows([]string{
-				prfx(models.AuthorsTable, models.AuthorsColID),
-				prfx(models.AuthorsTable, models.AuthorsColName),
+				prefix(models.AuthorsTable, models.AuthorsColID),
+				prefix(models.AuthorsTable, models.AuthorsColName),
 			}).AddRow(ID, entity.Name),
 		)
 
@@ -61,8 +61,8 @@ func TestCreateAuthors(t *testing.T) {
 		q.WithArgs(entity.Name)
 		q.WillReturnRows(
 			sqlmock.NewRows([]string{
-				prfx(models.AuthorsTable, models.AuthorsColID),
-				prfx(models.AuthorsTable, models.AuthorsColName),
+				prefix(models.AuthorsTable, models.AuthorsColID),
+				prefix(models.AuthorsTable, models.AuthorsColName),
 			}).AddRow(ID, entity.Name),
 		)
 		mock.ExpectCommit()

@@ -2,10 +2,34 @@ package repo
 
 import (
 	"context"
-	// sb "github.com/huandu/go-sqlbuilder"
+	"fmt"
 	"sandbox/sql/entities"
+	"sandbox/sql/sqlx/models"
+
+	sb "github.com/huandu/go-sqlbuilder"
+	"github.com/samber/lo"
 )
 
 func (r *repo) UpsertAuthor(ctx context.Context, item entities.Author) (entities.Author, error) {
-	return entities.Author{}, nil
+	m := r.mapper.AuthorToModel(item)
+
+	prfx := lo.Partial(prefix, models.AuthorsTable)
+
+	b := sb.InsertInto(models.AuthorsTable)
+	b.Cols(models.AuthorsColName)
+	b.Values(m.Name)
+	b.SQL(fmt.Sprintf("ON CONFLICT (%[1]s) DO UPDATE SET %[1]s = EXCLUDED.%[1]s", models.AuthorsColName))
+	b.SQL(returning(
+		prfx(models.AuthorsColID),
+		prfx(models.AuthorsColName),
+	))
+
+	query, args := b.Build()
+
+	var result models.Author
+	if err := r.db.GetContext(ctx, &result, query, args...); err != nil {
+		return entities.Author{}, fmt.Errorf("GetContext: %w", err)
+	}
+
+	return r.mapper.AuthorToEntity(result), nil
 }

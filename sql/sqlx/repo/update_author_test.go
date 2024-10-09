@@ -20,8 +20,8 @@ func Test_repo_UpdateAuthor(t *testing.T) {
 		q.WithArgs()
 		q.WillReturnRows(
 			sqlmock.NewRows([]string{
-				prfx(models.AuthorsTable, models.AuthorsColID),
-				prfx(models.AuthorsTable, models.AuthorsColName),
+				prefix(models.AuthorsTable, models.AuthorsColID),
+				prefix(models.AuthorsTable, models.AuthorsColName),
 			}).AddRow(
 				1,
 				"author1",

@@ -22,8 +22,8 @@ func Test_repo_ListAuthor(t *testing.T) {
 		q1.WithArgs("author")
 		q1.WillReturnRows(
 			sqlmock.NewRows([]string{
-				prfx(models.AuthorsTable, models.AuthorsColID),
-				prfx(models.AuthorsTable, models.AuthorsColName),
+				prefix(models.AuthorsTable, models.AuthorsColID),
+				prefix(models.AuthorsTable, models.AuthorsColName),
 			}).AddRow(11, "author1").AddRow(12, "author2"),
 		)
 

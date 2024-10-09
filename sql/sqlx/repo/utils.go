@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func prfx(prefix, name string) string {
+func prefix(prefix, name string) string {
 	return fmt.Sprintf("%s.%s", prefix, name)
 }
 

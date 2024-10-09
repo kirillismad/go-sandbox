@@ -20,8 +20,8 @@ func Test_repo_GetAuthor(t *testing.T) {
 		q := mock.ExpectQuery(query)
 		q.WithArgs(1)
 		q.WillReturnRows(sqlmock.NewRows([]string{
-			prfx(models.AuthorsTable, models.AuthorsColID),
-			prfx(models.AuthorsTable, models.AuthorsColName),
+			prefix(models.AuthorsTable, models.AuthorsColID),
+			prefix(models.AuthorsTable, models.AuthorsColName),
 		}).AddRow(
 			1,
 			"author1",
