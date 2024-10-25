@@ -121,7 +121,7 @@ func TestRangeOverSlice(t *testing.T) {
 		var nilSlice []int
 
 		for i, v := range nilSlice {
-			t.Log(i, v)
+			t.Errorf("nilSlice[%d] = %v", i, v)
 		}
 	})
 }

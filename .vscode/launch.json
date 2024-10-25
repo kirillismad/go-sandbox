@@ -12,6 +12,6 @@
             "internalConsoleOptions": "openOnSessionStart",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/main.go",
-        },
+        }
     ]
 }
