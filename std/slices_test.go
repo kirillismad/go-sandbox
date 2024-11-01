@@ -48,7 +48,7 @@ func TestSlicesAppend(t *testing.T) {
 
 		durtyAppend(slice)
 
-		r.ElementsMatch([]int{0, 0}, slice)
+		r.ElementsMatch([]int{}, slice)
 		t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
 	})
 
@@ -61,7 +61,26 @@ func TestSlicesAppend(t *testing.T) {
 
 		durtyAppend(slice)
 
-		r.ElementsMatch([]int{}, slice)
+		r.ElementsMatch([]int{0, 0}, slice)
+		t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
+	})
+
+	t.Run("dirty func, slicing side effect", func(t *testing.T) {
+		t.Parallel()
+
+		r := require.New(t)
+
+		var slice []int = []int{0, 1, 2, 3, 4} // len = 5, cap = 5
+		r.Equal(len(slice), 5)
+		r.Equal(cap(slice), 5)
+
+		slice0_3 := slice[:3] // len = 3, cap = 5
+		r.Equal(len(slice0_3), 3)
+		r.Equal(cap(slice0_3), 5)
+
+		durtyAppend(slice0_3)
+
+		r.ElementsMatch([]int{0, 1, 2, 42, 4}, slice)
 		t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
 	})
 }
