@@ -83,6 +83,15 @@ func TestSlicesAppend(t *testing.T) {
 		r.ElementsMatch([]int{0, 1, 2, 42, 4}, slice)
 		t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
 	})
+	t.Run("nil slice, many append", func(t *testing.T) {
+		var slice []int
+
+		t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
+		for i := 0; i < 10; i++ {
+			slice = append(slice, i)
+			t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
+		}
+	})
 }
 
 func TestSlicesIndexing(t *testing.T) {
