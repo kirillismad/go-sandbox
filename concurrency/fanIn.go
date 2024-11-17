@@ -10,6 +10,7 @@ func FanIn[T any](ctx context.Context, ins ...<-chan T) <-chan T {
 
 	go func() {
 		defer close(out)
+
 		var wg sync.WaitGroup
 		wg.Add(len(ins))
 
