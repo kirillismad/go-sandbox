@@ -1,4 +1,4 @@
-package ratelimiters
+package rate_limiters
 
 import (
 	"errors"

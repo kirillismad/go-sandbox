@@ -1,4 +1,4 @@
-package ratelimiters
+package rate_limiters
 
 import (
 	"context"
@@ -17,12 +17,12 @@ func TestTokenBucketRateLimiter_Acquire(t *testing.T) {
 		r := require.New(t)
 
 		ctx, cancel := context.WithCancel(context.Background())
-
 		t.Cleanup(cancel)
+
 		l := NewTokenBucketRateLimiter(
 			ctx,
-			map[string]Limit{},
-			WithDefaultLimit(Limit{
+			make(map[string]Limit),
+			WithDefaultLimit[*TokenBucketRateLimiter](Limit{
 				Unit:  2 * time.Second,
 				Limit: 1,
 			}),

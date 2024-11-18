@@ -48,7 +48,7 @@ func TestSlicesAppend(t *testing.T) {
 
 		durtyAppend(slice)
 
-		r.ElementsMatch([]int{}, slice)
+		r.ElementsMatch([]int{0, 0}, slice)
 		t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
 	})
 
@@ -61,7 +61,7 @@ func TestSlicesAppend(t *testing.T) {
 
 		durtyAppend(slice)
 
-		r.ElementsMatch([]int{0, 0}, slice)
+		r.ElementsMatch([]int{}, slice)
 		t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
 	})
 

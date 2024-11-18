@@ -1,4 +1,4 @@
-package ratelimiters
+package rate_limiters
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 )
 
 type Item struct {
-	tokens     int64
-	lastAccess time.Time
+	Tokens     int64
+	LastAccess time.Time
 }
 
 type Limit struct {
@@ -28,20 +28,28 @@ type TokenBucketRateLimiter struct {
 	cleanupInterval time.Duration
 }
 
-type Option func(l *TokenBucketRateLimiter)
+type ISetDefaultLimit interface {
+	SetDefaultLimit(l Limit)
+}
 
-func WithDefaultLimit(limit Limit) Option {
-	return func(l *TokenBucketRateLimiter) {
+type ISetTTL interface {
+	SetTTL(ttl time.Duration)
+}
+
+type Option[T any] func(l T)
+
+func WithDefaultLimit[T ISetDefaultLimit](limit Limit) Option[T] {
+	return func(l T) {
 		l.SetDefaultLimit(limit)
 	}
 }
 
-func WithTTL(ttl time.Duration) Option {
-	return func(l *TokenBucketRateLimiter) {
+func WithTTL[T ISetTTL](ttl time.Duration) Option[T] {
+	return func(l T) {
 		l.SetTTL(ttl)
 	}
 }
-func WithCleanupInterval(cleanupInterval time.Duration) Option {
+func WithCleanupInterval(cleanupInterval time.Duration) Option[*TokenBucketRateLimiter] {
 	return func(l *TokenBucketRateLimiter) {
 		l.cleanupInterval = cleanupInterval
 	}
@@ -55,7 +63,7 @@ var defaultLimit = Limit{
 const defaultTTL = 1 * time.Hour
 const defaultCleanupInterval = 1 * time.Minute
 
-func NewTokenBucketRateLimiter(ctx context.Context, limits map[string]Limit, opts ...Option) *TokenBucketRateLimiter {
+func NewTokenBucketRateLimiter(ctx context.Context, limits map[string]Limit, opts ...Option[*TokenBucketRateLimiter]) *TokenBucketRateLimiter {
 	l := &TokenBucketRateLimiter{
 		state:           make(map[string]Item),
 		cleanupInterval: defaultCleanupInterval,
@@ -91,25 +99,25 @@ func (l *TokenBucketRateLimiter) Acquire(ctx context.Context, operation string, 
 	item, found := l.state[key]
 	if !found {
 		tokens := limit.Limit - 1
-		l.state[key] = Item{tokens: tokens, lastAccess: now}
+		l.state[key] = Item{Tokens: tokens, LastAccess: now}
 		return Result{
 			Remaining: tokens,
 			Limit:     limit.Limit,
 		}, nil
 	}
 
-	timePassed := now.Sub(item.lastAccess)
+	timePassed := now.Sub(item.LastAccess)
 
 	rate := float64(limit.Limit) / float64(limit.Unit)
 	replenishedTokens := int64(math.Floor(float64(timePassed) * rate))
 
-	tokens := min(item.tokens+replenishedTokens, limit.Limit)
+	tokens := min(item.Tokens+replenishedTokens, limit.Limit)
 	if tokens < 1 {
 		return Result{}, NewErrRetryAfter(now.Add(time.Duration(math.Ceil(1.0 / rate))))
 	}
 
 	tokens--
-	l.state[key] = Item{tokens: tokens, lastAccess: now}
+	l.state[key] = Item{Tokens: tokens, LastAccess: now}
 
 	return Result{
 		Remaining: tokens,
@@ -129,7 +137,7 @@ func (l *TokenBucketRateLimiter) cleanup(ctx context.Context) {
 
 			l.m.Lock()
 			for k, v := range l.state {
-				if now.Sub(v.lastAccess) > l.ttl.Load().(time.Duration) {
+				if now.Sub(v.LastAccess) > l.ttl.Load().(time.Duration) {
 					delete(l.state, k)
 				}
 			}

@@ -1,27 +1,28 @@
-local tokens_key = KEYS[1]
-local timestamp_key = tokens_key .. ":timestamp"
-local max_tokens = tonumber(ARGV[1])
-local refill_rate = tonumber(ARGV[2])
-local now = tonumber(ARGV[3])
-local requested = 1
+local key = KEYS[1]
+local last_access_key = key .. ":last_access"
+local now = tonumber(ARGV[1])
+local unit = tonumber(ARGV[2])
+local limit = tonumber(ARGV[3])
+local ttl = tonumber(ARGV[4])
 
 -- Получить текущее состояние
-local tokens = tonumber(redis.call("GET", tokens_key) or max_tokens)
-local last_refill = tonumber(redis.call("GET", timestamp_key) or 0)
+local tokens = tonumber(redis.call("GET", key) or limit)
+local last_access = tonumber(redis.call("GET", last_access_key) or now)
 
 -- Рассчитать пополнение
-local time_passed = now - last_refill
-local tokens_to_add = math.floor(time_passed * refill_rate)
-tokens = math.min(tokens + tokens_to_add, max_tokens)
+local time_passed = now - last_access
+local rate = limit / unit
+local replenished_tokens = math.floor(time_passed * rate)
+tokens = math.min(tokens + replenished_tokens, limit)
 
-if tokens < requested then
+if tokens < 1 then
     -- Недостаточно токенов
-    return {0, tokens}
+    return {0, now + math.ceil(1 / rate)}
 end
 
 -- Обновляем состояние
-tokens = tokens - requested
-redis.call("SET", tokens_key, tokens, "EX", 60 * 60 * 24) -- Установить срок хранения (1 день)
-redis.call("SET", timestamp_key, now, "EX", 60 * 60 * 24)
+tokens = tokens - 1
+redis.call("SET", key, tokens, "EX", ttl)
+redis.call("SET", last_access_key, now, "EX", ttl)
 
 return {1, tokens}
