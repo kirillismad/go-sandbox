@@ -108,33 +108,38 @@ func (l *RedisTokenBucketRateLimiter) Prepare(ctx context.Context) error {
 }
 
 func (l *RedisTokenBucketRateLimiter) EvalSha(ctx context.Context, keys []string, args ...interface{}) (interface{}, error) {
-	res, err := l.rdb.EvalSha(ctx, l.scriptHash, keys, args...).Result()
-	if err == nil {
-		return res, nil
-	}
-
-	if err.Error() != "NOSCRIPT No matching script. Please use EVAL." {
-		return nil, fmt.Errorf("EvalSha: %w", err)
-	}
-
-	v := l.version.Load()
-	l.m.Lock()
-
-	if l.version.Load() == v {
-		hash, err := l.uploadLua(ctx)
-		if err != nil {
-			l.m.Unlock()
-			return nil, fmt.Errorf("uploadLua: %w", err)
+	for attempt := 0; attempt < 5; attempt++ {
+		res, err := l.rdb.EvalSha(ctx, l.scriptHash, keys, args...).Result()
+		if err == nil {
+			return res, nil
 		}
-		l.scriptHash = hash
-		l.version.Add(1)
-	}
-	l.m.Unlock()
 
-	res, err = l.rdb.EvalSha(ctx, l.scriptHash, keys, args...).Result()
+		if err.Error() != "NOSCRIPT No matching script. Please use EVAL." {
+			return nil, fmt.Errorf("EvalSha: %w", err)
+		}
+
+		v := l.version.Load()
+		l.m.Lock()
+
+		if l.version.Load() == v {
+			hash, err := l.uploadLua(ctx)
+			if err != nil {
+				l.m.Unlock()
+				return nil, fmt.Errorf("uploadLua: %w", err)
+			}
+			l.scriptHash = hash
+			l.version.Add(1)
+		}
+		l.m.Unlock()
+	}
+
+	res, err := l.rdb.EvalSha(ctx, l.scriptHash, keys, args...).Result()
 	if err != nil {
 		return nil, fmt.Errorf("EvalSha: %w", err)
 	}
+	return res, nil
+}
 
-	return res, err
+func (l *RedisTokenBucketRateLimiter) Version() int64 {
+	return l.version.Load()
 }

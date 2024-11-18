@@ -2,5 +2,4 @@
     "go.testFlags": [
         "-v"
     ],
-    "go.testTags": "redis_token_bucket",
 }
