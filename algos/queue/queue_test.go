@@ -16,12 +16,12 @@ func TestQueueEnque(t *testing.T) {
 		queue Queue[int]
 	}{
 		{
-			name:  "Queue1",
-			queue: NewQueue1[int](),
+			name:  "SliceQueue",
+			queue: NewSliceQueue[int](),
 		},
 		{
-			name:  "Queue2",
-			queue: NewQueue2[int](),
+			name:  "ListQueue",
+			queue: NewListQueue[int](),
 		},
 	}
 
@@ -42,12 +42,12 @@ func TestQueueDeque(t *testing.T) {
 		queue Queue[int]
 	}{
 		{
-			name:  "Queue1",
-			queue: NewQueue1[int](),
+			name:  "SliceQueue",
+			queue: NewSliceQueue[int](),
 		},
 		{
-			name:  "Queue2",
-			queue: NewQueue2[int](),
+			name:  "ListQueue",
+			queue: NewListQueue[int](),
 		},
 	}
 
@@ -74,12 +74,12 @@ func TestQueueIter(t *testing.T) {
 		queue Queue[int]
 	}{
 		{
-			name:  "Queue1",
-			queue: NewQueue1[int](),
+			name:  "SliceQueue",
+			queue: NewSliceQueue[int](),
 		},
 		{
-			name:  "Queue2",
-			queue: NewQueue2[int](),
+			name:  "ListQueue",
+			queue: NewListQueue[int](),
 		},
 	}
 
@@ -95,9 +95,9 @@ func TestQueueIter(t *testing.T) {
 
 			var iter gof.Iterator[int]
 			switch q := c.queue.(type) {
-			case *Queue1[int]:
+			case *SliceQueue[int]:
 				iter = q.Iterator()
-			case *Queue2[int]:
+			case *ListQueue[int]:
 				iter = q.Iterator()
 			}
 			for {
@@ -114,18 +114,18 @@ func TestQueueIter(t *testing.T) {
 	}
 }
 
-func TestQueue1(t *testing.T) {
+func TestSliceQueue(t *testing.T) {
 	cases := []struct {
 		name  string
 		queue Queue[int]
 	}{
 		{
-			name:  "Queue1",
-			queue: NewQueue1[int](),
+			name:  "SliceQueue",
+			queue: NewSliceQueue[int](),
 		},
 		{
-			name:  "Queue2",
-			queue: NewQueue2[int](),
+			name:  "ListQueue",
+			queue: NewListQueue[int](),
 		},
 	}
 

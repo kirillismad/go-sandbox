@@ -10,20 +10,20 @@ type node[T any] struct {
 	next  *node[T]
 }
 
-type Queue2[T any] struct {
+type ListQueue[T any] struct {
 	head *node[T]
 	tail *node[T]
 	cond *sync.Cond
 }
 
-func NewQueue2[T any]() *Queue2[T] {
-	return &Queue2[T]{
+func NewListQueue[T any]() *ListQueue[T] {
+	return &ListQueue[T]{
 		cond: sync.NewCond(&sync.Mutex{}),
 	}
 
 }
 
-func (q *Queue2[T]) Enque(item T) error {
+func (q *ListQueue[T]) Enque(item T) error {
 	q.cond.L.Lock()
 	defer q.cond.L.Unlock()
 	n := &node[T]{value: item}
@@ -40,7 +40,7 @@ func (q *Queue2[T]) Enque(item T) error {
 	return nil
 }
 
-func (q *Queue2[T]) Deque() (T, error) {
+func (q *ListQueue[T]) Deque() (T, error) {
 	q.cond.L.Lock()
 	defer q.cond.L.Unlock()
 	for q.head == nil && q.tail == nil {
@@ -57,7 +57,7 @@ func (q *Queue2[T]) Deque() (T, error) {
 	return item, nil
 }
 
-func (q *Queue2[T]) Iterator() gof.Iterator[T] {
+func (q *ListQueue[T]) Iterator() gof.Iterator[T] {
 	return &queue2Iterator[T]{
 		q:       q,
 		current: q.head,
@@ -65,7 +65,7 @@ func (q *Queue2[T]) Iterator() gof.Iterator[T] {
 }
 
 type queue2Iterator[T any] struct {
-	q       *Queue2[T]
+	q       *ListQueue[T]
 	current *node[T]
 }
 

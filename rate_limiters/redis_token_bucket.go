@@ -26,7 +26,6 @@ func NewRedisTokenBucketRateLimiter(rdb *redis.Client, limits map[string]Limit, 
 		rdb: rdb,
 	}
 	l.SetLimits(limits)
-
 	l.SetDefaultLimit(defaultLimit)
 	l.SetTTL(defaultTTL)
 

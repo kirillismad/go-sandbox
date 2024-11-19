@@ -153,7 +153,7 @@ func TestStackIterator(t *testing.T) {
 					t.Error(err)
 				}
 			}
-			var iter gof.Iterator[int] = c.stack.Iterator()
+			var iter = c.stack.Iterator()
 			for {
 				next, err := iter.Next()
 				if errors.Is(err, gof.ErrIteratorNext) {

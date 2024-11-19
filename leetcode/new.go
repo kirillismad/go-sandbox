@@ -6,7 +6,7 @@ import (
 
 func threeSum(nums []int) [][]int {
 	sort.Ints(nums)
-	ans := [][]int{}
+	var ans [][]int
 
 	for i := 0; i < len(nums) && nums[i] <= 0; i++ {
 		// после того как первый элемент был обработан (i > 0)

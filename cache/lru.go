@@ -5,20 +5,20 @@ import (
 	"fmt"
 )
 
-// Кэш на основе LRU
+// LRUCache is a cache based on LRU
 type LRUCache struct {
-	capacity int                      // Максимальная емкость кэша
-	cache    map[string]*list.Element // Хранение данных в виде хэша
-	order    *list.List               // Двусвязный список для порядка использования
+	capacity int                      // Maximum cache capacity
+	cache    map[string]*list.Element // Storing data as a hash
+	order    *list.List               // Doubly linked list for usage order
 }
 
-// Элемент кэша
+// Cache entry
 type entry struct {
 	key   string
 	value string
 }
 
-// Создает новый LRU-кэш с заданной емкостью
+// NewLRUCache Creates a new LRU cache with the given capacity
 func NewLRUCache(capacity int) *LRUCache {
 	return &LRUCache{
 		capacity: capacity,
@@ -27,27 +27,27 @@ func NewLRUCache(capacity int) *LRUCache {
 	}
 }
 
-// Получает значение из кэша
+// Get Gets a value from the cache
 func (c *LRUCache) Get(key string) (string, bool) {
 	if elem, found := c.cache[key]; found {
-		c.order.MoveToFront(elem) // Перемещение в начало как самый недавно использованный
+		c.order.MoveToFront(elem) // Move to front as the most recently used
 		return elem.Value.(*entry).value, true
 	}
-	return "", false // Элемент не найден
+	return "", false // Element not found
 }
 
-// Добавляет значение в кэш
+// Put Puts a value into the cache
 func (c *LRUCache) Put(key, value string) {
 	if elem, found := c.cache[key]; found {
-		// Обновление существующего элемента
+		// Update existing element
 		c.order.MoveToFront(elem)
 		elem.Value.(*entry).value = value
 		return
 	}
 
-	// Добавление нового элемента
+	// Add new element
 	if c.order.Len() >= c.capacity {
-		// Если кэш заполнен, удаляем последний элемент (наименее использованный)
+		// If cache is full, remove the last element (least recently used)
 		oldest := c.order.Back()
 		if oldest != nil {
 			c.order.Remove(oldest)
@@ -55,13 +55,12 @@ func (c *LRUCache) Put(key, value string) {
 		}
 	}
 
-	// Добавление нового элемента в начало
+	// Add new element to the front
 	newEntry := &entry{key, value}
 	elem := c.order.PushFront(newEntry)
 	c.cache[key] = elem
 }
 
-// Пример использования
 func main() {
 	cache := NewLRUCache(3)
 	cache.Put("A", "value1")
@@ -70,9 +69,9 @@ func main() {
 
 	fmt.Println(cache.Get("A")) // Output: value1, true
 
-	cache.Put("D", "value4") // Вытесняет "B" так как он менее использован
+	cache.Put("D", "value4") // Evicts "B" as it is the least recently used
 
-	_, found := cache.Get("B") // Output: false, так как "B" был вытеснен
+	_, found := cache.Get("B") // Output: false, as "B" was evicted
 	fmt.Println("B found:", found)
 
 	fmt.Println(cache.Get("C")) // Output: value3, true

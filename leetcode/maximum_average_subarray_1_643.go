@@ -19,7 +19,7 @@ func findMaxAverage(nums []int, k int) float64 {
 		if rightIndex+1 >= k {
 			sum -= leftValue
 
-			ans = max(float64(sum)/float64(k), ans)
+			ans = max(sum/float64(k), ans)
 
 			leftValue = float64(nums[rightIndex+1-k]) // leftIndex = rightIndex + 1 - k
 		}

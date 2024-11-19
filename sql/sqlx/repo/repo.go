@@ -15,7 +15,7 @@ func init() {
 	sqlbuilder.DefaultFlavor = sqlbuilder.PostgreSQL
 }
 
-type RepoHandler interface {
+type Handler interface {
 	GetRepo() Repo
 	InTrasaction(funcTx func(repo Repo) error) error
 }
@@ -33,7 +33,7 @@ type repoHandler struct {
 	db *sqlx.DB
 }
 
-func NewRepoHandler(db *sqlx.DB) RepoHandler {
+func NewRepoHandler(db *sqlx.DB) Handler {
 	return &repoHandler{db: db}
 }
 

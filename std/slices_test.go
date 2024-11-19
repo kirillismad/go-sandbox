@@ -31,7 +31,7 @@ func TestSlicesAppend(t *testing.T) {
 
 		r := require.New(t)
 
-		var slice []int = []int{1, 2}
+		var slice = []int{1, 2}
 
 		durtyAppend(slice)
 
@@ -44,7 +44,7 @@ func TestSlicesAppend(t *testing.T) {
 
 		r := require.New(t)
 
-		var slice []int = make([]int, 2)
+		var slice = make([]int, 2)
 
 		durtyAppend(slice)
 
@@ -57,7 +57,7 @@ func TestSlicesAppend(t *testing.T) {
 
 		r := require.New(t)
 
-		var slice []int = make([]int, 0, 2)
+		var slice = make([]int, 0, 2)
 
 		durtyAppend(slice)
 
@@ -70,15 +70,15 @@ func TestSlicesAppend(t *testing.T) {
 
 		r := require.New(t)
 
-		var slice []int = []int{0, 1, 2, 3, 4} // len = 5, cap = 5
+		var slice = []int{0, 1, 2, 3, 4} // len = 5, cap = 5
 		r.Equal(len(slice), 5)
 		r.Equal(cap(slice), 5)
 
-		slice0_3 := slice[:3] // len = 3, cap = 5
-		r.Equal(len(slice0_3), 3)
-		r.Equal(cap(slice0_3), 5)
+		slice03 := slice[:3] // len = 3, cap = 5
+		r.Equal(len(slice03), 3)
+		r.Equal(cap(slice03), 5)
 
-		durtyAppend(slice0_3)
+		durtyAppend(slice03)
 
 		r.ElementsMatch([]int{0, 1, 2, 42, 4}, slice)
 		t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))

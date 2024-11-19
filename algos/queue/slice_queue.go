@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-type Queue1[T any] struct {
+type SliceQueue[T any] struct {
 	slice []T
 	head  int
 	tail  int
@@ -15,8 +15,8 @@ type Queue1[T any] struct {
 
 const initLen = 4
 
-func NewQueue1[T any]() *Queue1[T] {
-	return &Queue1[T]{
+func NewSliceQueue[T any]() *SliceQueue[T] {
+	return &SliceQueue[T]{
 		slice: make([]T, initLen),
 		head:  0,
 		tail:  0,
@@ -25,7 +25,7 @@ func NewQueue1[T any]() *Queue1[T] {
 	}
 }
 
-func (q *Queue1[T]) resize(size int) {
+func (q *SliceQueue[T]) resize(size int) {
 	newSlice := make([]T, size)
 
 	j := q.head
@@ -42,7 +42,7 @@ func (q *Queue1[T]) resize(size int) {
 	q.tail = q.size
 }
 
-func (q *Queue1[T]) Enque(item T) error {
+func (q *SliceQueue[T]) Enque(item T) error {
 	q.mutex.L.Lock()
 	defer q.mutex.L.Unlock()
 
@@ -61,7 +61,7 @@ func (q *Queue1[T]) Enque(item T) error {
 	return nil
 }
 
-func (q *Queue1[T]) Deque() (T, error) {
+func (q *SliceQueue[T]) Deque() (T, error) {
 	q.mutex.L.Lock()
 	defer q.mutex.L.Unlock()
 
@@ -82,7 +82,7 @@ func (q *Queue1[T]) Deque() (T, error) {
 	return item, nil
 }
 
-func (q *Queue1[T]) Iterator() gof.Iterator[T] {
+func (q *SliceQueue[T]) Iterator() gof.Iterator[T] {
 	return &queue1Iterator[T]{
 		queue: q,
 		index: 0,
@@ -90,7 +90,7 @@ func (q *Queue1[T]) Iterator() gof.Iterator[T] {
 }
 
 type queue1Iterator[T any] struct {
-	queue *Queue1[T]
+	queue *SliceQueue[T]
 	index int
 }
 

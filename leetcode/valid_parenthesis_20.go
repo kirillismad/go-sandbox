@@ -7,7 +7,7 @@ func isValid(s string) bool {
 		']': '[',
 		'}': '{',
 	}
-	stack := []rune{}
+	var stack []rune
 
 	for _, r := range s {
 		open, isClosing := closeOpen[r]

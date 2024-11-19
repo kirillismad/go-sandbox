@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func initTest(t *testing.T) (*require.Assertions, RepoHandler, sqlmock.Sqlmock) {
+func initTest(t *testing.T) (*require.Assertions, Handler, sqlmock.Sqlmock) {
 	r := require.New(t)
 
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
