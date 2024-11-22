@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -113,7 +114,7 @@ func (l *RedisTokenBucketRateLimiter) EvalSha(ctx context.Context, keys []string
 			return res, nil
 		}
 
-		if err.Error() != "NOSCRIPT No matching script. Please use EVAL." {
+		if strings.Contains(err.Error(), "NOSCRIPT") {
 			return nil, fmt.Errorf("EvalSha: %w", err)
 		}
 
@@ -137,8 +138,4 @@ func (l *RedisTokenBucketRateLimiter) EvalSha(ctx context.Context, keys []string
 		return nil, fmt.Errorf("EvalSha: %w", err)
 	}
 	return res, nil
-}
-
-func (l *RedisTokenBucketRateLimiter) Version() int64 {
-	return l.version.Load()
 }
