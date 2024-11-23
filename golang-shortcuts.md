@@ -24,14 +24,36 @@
 - 6 = git
 - 7 = problems
 
+- a
+- b
+- c
+- d
 - e = recent files
+- f = find
+- g
+- h
 - i = organize imports
 - j = show context action
+- k
 - l = format code
+- m
 - n = new
 - o = go to class
 - p = parameter info
+- q
+- r = replace
+- s
+- t
+- u
+- v
 - w = close tab
+- x
+- y
+- z
+
+- / = comment with line comment
+- page down = next found occurrence
+- page up = previous found occurrence
 
 ## CTRL
 
@@ -42,6 +64,9 @@
 
 ## SHIFT-ALT
 
+- f = find in all files
+- r = replace in all files
+
 - left = select to previous word
 - right = select to next word
 - up = select to previous paragraph
@@ -49,6 +74,8 @@
 
 - o = go to file
 - w = close other tabs
+
+- / = comment with block comment
 
 ## CTRL-SHIFT
 
