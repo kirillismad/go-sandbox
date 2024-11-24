@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-func TestLRUCache(t *testing.T) {
+func TestLFUCache(t *testing.T) {
 	t.Parallel()
 
 	r := require.New(t)
 
-	cache := NewLRUCache[int](2)
+	cache := NewLFUCache[int](2)
 
 	cache.Put("a", 1)
 	cache.Put("b", 2)
