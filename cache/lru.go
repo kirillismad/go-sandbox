@@ -5,6 +5,11 @@ import (
 	"sync"
 )
 
+type lruEntity[T any] struct {
+	key   string
+	value T
+}
+
 type LRUCache[T any] struct {
 	capacity int
 	cache    map[string]*list.Element
@@ -28,7 +33,7 @@ func (c *LRUCache[T]) Get(key string) (T, bool) {
 
 	if elem, found := c.cache[key]; found {
 		c.order.MoveToFront(elem)
-		return elem.Value.(*Entry[T]).value, true
+		return elem.Value.(*lruEntity[T]).value, true
 	}
 
 	return zero, false
@@ -40,7 +45,7 @@ func (c *LRUCache[T]) Put(key string, value T) {
 
 	if elem, found := c.cache[key]; found {
 		c.order.MoveToFront(elem)
-		elem.Value.(*Entry[T]).value = value
+		elem.Value.(*lruEntity[T]).value = value
 		return
 	}
 
@@ -48,11 +53,11 @@ func (c *LRUCache[T]) Put(key string, value T) {
 		oldest := c.order.Back()
 		if oldest != nil {
 			c.order.Remove(oldest)
-			delete(c.cache, oldest.Value.(*Entry[T]).key)
+			delete(c.cache, oldest.Value.(*lruEntity[T]).key)
 		}
 	}
 
-	newEntry := &Entry[T]{key: key, value: value}
+	newEntry := &lruEntity[T]{key: key, value: value}
 	elem := c.order.PushFront(newEntry)
 	c.cache[key] = elem
 }
