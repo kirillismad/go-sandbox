@@ -15,6 +15,7 @@
 - right = move caret to next word
 - ] **OR** mouse 5 = forward
 - [ **OR** mouse 4 = back
+- enter = start new line
 
 - 1 = project
 - 2 = structure
