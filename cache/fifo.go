@@ -17,7 +17,7 @@ type FIFOCache[T any] struct {
 	mu       sync.RWMutex
 }
 
-func NewFIFOCache[T any](capacity int) *FIFOCache[T] {
+func NewFIFOCache[T any](capacity int) Cache[T] {
 	return &FIFOCache[T]{
 		capacity: capacity,
 		cache:    make(map[string]*list.Element, capacity),

@@ -28,48 +28,12 @@ type TokenBucketRateLimiter struct {
 	cleanupInterval time.Duration
 }
 
-type ISetDefaultLimit interface {
-	SetDefaultLimit(l Limit)
-}
-
-type ISetTTL interface {
-	SetTTL(ttl time.Duration)
-}
-
-type Option[T any] func(l T)
-
-func WithDefaultLimit[T ISetDefaultLimit](limit Limit) Option[T] {
-	return func(l T) {
-		l.SetDefaultLimit(limit)
-	}
-}
-
-func WithTTL[T ISetTTL](ttl time.Duration) Option[T] {
-	return func(l T) {
-		l.SetTTL(ttl)
-	}
-}
-func WithCleanupInterval(cleanupInterval time.Duration) Option[*TokenBucketRateLimiter] {
-	return func(l *TokenBucketRateLimiter) {
-		l.cleanupInterval = cleanupInterval
-	}
-}
-
-var defaultLimit = Limit{
-	Unit:  time.Minute,
-	Limit: 1,
-}
-
-const defaultTTL = 1 * time.Hour
-const defaultCleanupInterval = 1 * time.Minute
-
 func NewTokenBucketRateLimiter(ctx context.Context, limits map[string]Limit, opts ...Option[*TokenBucketRateLimiter]) *TokenBucketRateLimiter {
 	l := &TokenBucketRateLimiter{
 		state:           make(map[string]Item),
 		cleanupInterval: defaultCleanupInterval,
 	}
 	l.SetLimits(limits)
-
 	l.SetDefaultLimit(defaultLimit)
 	l.SetTTL(defaultTTL)
 

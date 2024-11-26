@@ -6,13 +6,13 @@ import (
 )
 
 type FIFOShardsCache[T any] struct {
-	shards    []*FIFOCache[T]
+	shards    []Cache[T]
 	numShards int
 }
 
 func NewFIFOShardsCache[T any](numShards int, shardSize int) *FIFOShardsCache[T] {
 	return &FIFOShardsCache[T]{
-		shards:    lo.Times(numShards, func(_ int) *FIFOCache[T] { return NewFIFOCache[T](shardSize) }),
+		shards:    lo.Times(numShards, func(_ int) Cache[T] { return NewFIFOCache[T](shardSize) }),
 		numShards: numShards,
 	}
 }

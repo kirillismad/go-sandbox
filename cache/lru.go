@@ -17,7 +17,7 @@ type LRUCache[T any] struct {
 	mu       sync.Mutex
 }
 
-func NewLRUCache[T any](capacity int) *LRUCache[T] {
+func NewLRUCache[T any](capacity int) Cache[T] {
 	return &LRUCache[T]{
 		capacity: capacity,
 		cache:    make(map[string]*list.Element, capacity),

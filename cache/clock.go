@@ -18,7 +18,7 @@ type ClockCache[T any] struct {
 	mu       sync.Mutex
 }
 
-func NewClockCache[T any](capacity int) *ClockCache[T] {
+func NewClockCache[T any](capacity int) Cache[T] {
 	return &ClockCache[T]{
 		capacity: capacity,
 		cache:    make(map[string]*clockEntry[T], capacity),

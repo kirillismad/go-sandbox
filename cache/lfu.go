@@ -49,7 +49,7 @@ type LFUCache[T any] struct {
 	mu       sync.Mutex
 }
 
-func NewLFUCache[T any](capacity int) *LFUCache[T] {
+func NewLFUCache[T any](capacity int) Cache[T] {
 	h := &lfuHeap[T]{}
 	heap.Init(h)
 	return &LFUCache[T]{

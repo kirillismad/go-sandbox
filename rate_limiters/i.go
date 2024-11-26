@@ -1,12 +1,14 @@
 package rate_limiters
 
 import (
-	"errors"
+	"context"
 	"fmt"
 	"time"
 )
 
-var ErrTryLater = errors.New("try later")
+var (
+	ErrRateLimitExceeded = fmt.Errorf("rate limit exceeded")
+)
 
 type Result struct {
 	Remaining int64
@@ -32,5 +34,5 @@ func (e ErrRetryAfter) RetryAfter() time.Time {
 }
 
 type RateLimiter interface {
-	Acquire() (Result, error)
+	Acquire(ctx context.Context, operation, ip string) (Result, error)
 }
