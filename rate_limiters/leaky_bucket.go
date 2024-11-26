@@ -11,7 +11,7 @@ import (
 
 // TODO
 // 1. Add tests
-// 2. Add `burst` option instead creating a bucket with `.Limit` capacity
+// 2. Add `cap` option instead creating a bucket with `.Limit` capacity
 
 type request struct {
 	done chan struct{}
