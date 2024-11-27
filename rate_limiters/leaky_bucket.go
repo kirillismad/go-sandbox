@@ -17,30 +17,42 @@ type request struct {
 	done chan struct{}
 }
 
+type CapLimit struct {
+	Limit
+	Cap int64
+}
+
 type lbItem struct {
 	bucket     chan request
 	cancel     context.CancelFunc
 	lastAccess time.Time
 }
 
+var defaultCapLimit = CapLimit{
+	Limit: defaultLimit,
+	Cap:   64,
+}
+
 type LeakyBucketRateLimiter struct {
 	state           map[string]lbItem
-	m               sync.Mutex
+	mu              sync.Mutex
 	limits          atomic.Value
 	defaultLimit    atomic.Value
 	ttl             atomic.Value
 	cleanupInterval time.Duration
 }
 
-func NewLeakyBucketRateLimiter(ctx context.Context, limits map[string]Limit, opts ...Option[*LeakyBucketRateLimiter]) *LeakyBucketRateLimiter {
+func NewLeakyBucketRateLimiter(ctx context.Context, limits map[string]CapLimit, opts ...Option[*LeakyBucketRateLimiter]) *LeakyBucketRateLimiter {
 	l := &LeakyBucketRateLimiter{
 		state:           make(map[string]lbItem),
 		cleanupInterval: defaultCleanupInterval,
 	}
 
-	l.SetTTL(defaultTTL)
-	l.SetDefaultLimit(defaultLimit)
 	l.SetLimits(limits)
+
+	l.SetTTL(defaultTTL)
+	l.SetDefaultLimit(defaultCapLimit)
+	l.SetCleanupInterval(defaultCleanupInterval)
 
 	for _, opt := range opts {
 		opt(l)
@@ -52,27 +64,27 @@ func NewLeakyBucketRateLimiter(ctx context.Context, limits map[string]Limit, opt
 }
 
 func (l *LeakyBucketRateLimiter) Acquire(ctx context.Context, operation, ip string) (Result, error) {
-	limitMap := l.limits.Load().(map[string]Limit)
+	limitMap := l.limits.Load().(map[string]CapLimit)
 
 	limit, found := limitMap[operation]
 	if !found {
-		limit = l.defaultLimit.Load().(Limit)
+		limit = l.defaultLimit.Load().(CapLimit)
 	}
 
 	key := fmt.Sprintf("rate_limit:%s:%s", operation, ip)
 
-	l.m.Lock()
+	l.mu.Lock()
 	item, found := l.state[key]
 	if !found {
 		newCtx, cancel := context.WithCancel(context.Background())
-		item = lbItem{bucket: make(chan request, limit.Limit), cancel: cancel}
+		item = lbItem{bucket: make(chan request, limit.Cap), cancel: cancel}
 
 		startLeaker(newCtx, item.bucket, limit)
 		l.state[key] = item
 	}
-	l.m.Unlock()
+	l.mu.Unlock()
 
-	if len(item.bucket) >= int(limit.Limit) {
+	if len(item.bucket) >= int(limit.Cap) {
 		return Result{}, ErrRateLimitExceeded
 	}
 
@@ -91,12 +103,13 @@ func (l *LeakyBucketRateLimiter) Acquire(ctx context.Context, operation, ip stri
 		return Result{}, ctx.Err()
 	}
 
-	return Result{Remaining: int64(cap(item.bucket) - len(item.bucket)), Limit: limit.Limit}, nil
+	return Result{Remaining: int64(cap(item.bucket) - len(item.bucket)), Limit: limit.Cap}, nil
 }
 
-func startLeaker(ctx context.Context, bucket <-chan request, limit Limit) {
+func startLeaker(ctx context.Context, bucket <-chan request, limit CapLimit) {
 	go func() {
-		rate := float64(limit.Limit) / float64(limit.Unit)
+		rate := float64(limit.Limit.Unit) / float64(limit.Limit.Limit)
+
 		ticker := time.NewTicker(time.Duration(math.Floor(rate)))
 		defer ticker.Stop()
 
@@ -117,16 +130,20 @@ func startLeaker(ctx context.Context, bucket <-chan request, limit Limit) {
 	}()
 }
 
-func (l *LeakyBucketRateLimiter) SetLimits(limits map[string]Limit) {
+func (l *LeakyBucketRateLimiter) SetLimits(limits map[string]CapLimit) {
 	l.limits.Store(limits)
 }
 
-func (l *LeakyBucketRateLimiter) SetDefaultLimit(defaultLimit Limit) {
+func (l *LeakyBucketRateLimiter) SetDefaultLimit(defaultLimit CapLimit) {
 	l.defaultLimit.Store(defaultLimit)
 }
 
 func (l *LeakyBucketRateLimiter) SetTTL(ttl time.Duration) {
 	l.ttl.Store(ttl)
+}
+
+func (l *LeakyBucketRateLimiter) SetCleanupInterval(interval time.Duration) {
+	l.cleanupInterval = interval
 }
 
 func (l *LeakyBucketRateLimiter) cleanup(ctx context.Context) {
@@ -135,7 +152,7 @@ func (l *LeakyBucketRateLimiter) cleanup(ctx context.Context) {
 	for {
 		select {
 		case <-ticker.C:
-			l.m.Lock()
+			l.mu.Lock()
 			now := time.Now()
 			for key, item := range l.state {
 				if now.Sub(item.lastAccess) > l.ttl.Load().(time.Duration) {
@@ -143,7 +160,7 @@ func (l *LeakyBucketRateLimiter) cleanup(ctx context.Context) {
 					delete(l.state, key)
 				}
 			}
-			l.m.Unlock()
+			l.mu.Unlock()
 		case <-ctx.Done():
 			return
 		}

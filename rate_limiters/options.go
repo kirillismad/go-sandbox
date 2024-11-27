@@ -4,11 +4,11 @@ import "time"
 
 type Option[T any] func(l T)
 
-type ISetDefaultLimit interface {
-	SetDefaultLimit(l Limit)
+type ISetDefaultLimit[L any] interface {
+	SetDefaultLimit(l L)
 }
 
-func WithDefaultLimit[T ISetDefaultLimit](limit Limit) Option[T] {
+func WithDefaultLimit[T ISetDefaultLimit[L], L any](limit L) Option[T] {
 	return func(l T) {
 		l.SetDefaultLimit(limit)
 	}

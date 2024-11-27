@@ -31,7 +31,7 @@
 - d
 - e = recent files
 - f = find
-- g
+- g = generate ...
 - h
 - i = organize imports
 - j = show context action

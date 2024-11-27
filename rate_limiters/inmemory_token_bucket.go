@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-type Item struct {
-	Tokens     int64
-	LastAccess time.Time
+type tokenItem struct {
+	tokens     int64
+	lastAccess time.Time
 }
 
 type Limit struct {
@@ -20,7 +20,7 @@ type Limit struct {
 }
 
 type TokenBucketRateLimiter struct {
-	state           map[string]Item
+	state           map[string]tokenItem
 	m               sync.Mutex
 	limits          atomic.Value
 	defaultLimit    atomic.Value
@@ -30,7 +30,7 @@ type TokenBucketRateLimiter struct {
 
 func NewTokenBucketRateLimiter(ctx context.Context, limits map[string]Limit, opts ...Option[*TokenBucketRateLimiter]) *TokenBucketRateLimiter {
 	l := &TokenBucketRateLimiter{
-		state:           make(map[string]Item),
+		state:           make(map[string]tokenItem),
 		cleanupInterval: defaultCleanupInterval,
 	}
 	l.SetLimits(limits)
@@ -63,25 +63,25 @@ func (l *TokenBucketRateLimiter) Acquire(ctx context.Context, operation string, 
 	item, found := l.state[key]
 	if !found {
 		tokens := limit.Limit - 1
-		l.state[key] = Item{Tokens: tokens, LastAccess: now}
+		l.state[key] = tokenItem{tokens: tokens, lastAccess: now}
 		return Result{
 			Remaining: tokens,
 			Limit:     limit.Limit,
 		}, nil
 	}
 
-	timePassed := now.Sub(item.LastAccess)
+	timePassed := now.Sub(item.lastAccess)
 
 	rate := float64(limit.Limit) / float64(limit.Unit)
 	replenishedTokens := int64(math.Floor(float64(timePassed) * rate))
 
-	tokens := min(item.Tokens+replenishedTokens, limit.Limit)
+	tokens := min(item.tokens+replenishedTokens, limit.Limit)
 	if tokens < 1 {
 		return Result{}, NewErrRetryAfter(now.Add(time.Duration(math.Ceil(1.0 / rate))))
 	}
 
 	tokens--
-	l.state[key] = Item{Tokens: tokens, LastAccess: now}
+	l.state[key] = tokenItem{tokens: tokens, lastAccess: now}
 
 	return Result{
 		Remaining: tokens,
@@ -101,7 +101,7 @@ func (l *TokenBucketRateLimiter) cleanup(ctx context.Context) {
 
 			l.m.Lock()
 			for k, v := range l.state {
-				if now.Sub(v.LastAccess) > l.ttl.Load().(time.Duration) {
+				if now.Sub(v.lastAccess) > l.ttl.Load().(time.Duration) {
 					delete(l.state, k)
 				}
 			}
