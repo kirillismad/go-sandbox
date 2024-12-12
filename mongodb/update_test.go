@@ -1,3 +1,5 @@
+//go:build mongodb
+
 package mongodb
 
 import (
@@ -22,7 +24,7 @@ func (s *MongoDBTestSuite) TestUpdate() {
 
 		user.Username = gofakeit.Username()
 
-		update := bson.D{{"$set", bson.D{{"username", user.Username}}}}
+		update := bson.D{{Key: "$set", Value: bson.D{{Key: "username", Value: user.Username}}}}
 
 		result, err := s.db.Collection(usersCol).UpdateByID(context.TODO(), user.ID, update)
 		r.NoError(err)
@@ -41,8 +43,8 @@ func (s *MongoDBTestSuite) TestUpdate() {
 
 		user.Username = gofakeit.Username()
 
-		filter := bson.D{{"_id", user.ID}}
-		update := bson.D{{"$set", bson.D{{"username", user.Username}}}}
+		filter := bson.D{{Key: "_id", Value: user.ID}}
+		update := bson.D{{Key: "$set", Value: bson.D{{"username", user.Username}}}}
 
 		result, err := s.db.Collection(usersCol).UpdateOne(context.TODO(), filter, update)
 		r.NoError(err)
@@ -78,13 +80,13 @@ func (s *MongoDBTestSuite) TestUpdate() {
 		r.NoError(err)
 		r.Len(posts.InsertedIDs, 2)
 		s.T().Cleanup(func() {
-			del, err := s.db.Collection(postsCol).DeleteMany(context.TODO(), bson.D{{"_id", bson.D{{"$in", posts.InsertedIDs}}}})
+			del, err := s.db.Collection(postsCol).DeleteMany(context.TODO(), bson.D{{Key: "_id", Value: bson.D{{"$in", posts.InsertedIDs}}}})
 			r.NoError(err)
 			r.Equal(int64(2), del.DeletedCount)
 		})
 
-		filter := bson.D{{"user_id", user.ID}}
-		update := bson.D{{"$set", bson.D{{"text", gofakeit.Phrase()}}}}
+		filter := bson.D{{Key: "user_id", Value: user.ID}}
+		update := bson.D{{Key: "$set", Value: bson.D{{"text", gofakeit.Phrase()}}}}
 
 		result, err := s.db.Collection(postsCol).UpdateMany(context.TODO(), filter, update)
 		r.NoError(err)
@@ -114,7 +116,7 @@ func (s *MongoDBTestSuite) TestUpdate() {
 		post.CreatedAt = time.Now()
 		post.Tags = []string{gofakeit.Word(), gofakeit.Word(), gofakeit.Word()}
 
-		filter := bson.D{{"user_id", post.UserID}}
+		filter := bson.D{{Key: "user_id", Value: post.UserID}}
 		result, err := s.db.Collection(postsCol).ReplaceOne(context.TODO(), filter, post)
 		r.NoError(err)
 		r.Equal(int64(1), result.ModifiedCount)

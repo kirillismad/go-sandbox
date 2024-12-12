@@ -1,0 +1,64 @@
+networks:
+  go_sandbox:
+
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/go:1-1.23-bookworm
+    env_file:
+      - .env
+
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    networks:
+      - go_sandbox
+  
+  mongo:
+    hostname: ${MONGO_HOST}
+    image: mongo:latest
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - ${MONGO_LOCAL_PORT}:27017
+    networks:
+      - go_sandbox
+
+  mongo_express:
+    hostname: ${MONGO_EXPRESS_HOST}
+    image: mongo-express:latest
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_URL: "mongodb://mongo:27017"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: ${MONGO_HOST}
+    ports:
+      - ${MONGO_EXPRESS_LOCAL_PORT}:8081
+    networks:
+      - go_sandbox
+  
+  redis:
+    hostname: ${REDIS_HOST}
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - ${REDIS_LOCAL_PORT}:6379
+    networks:
+      - go_sandbox
+
+  postgres:
+    hostname: ${POSTGRES_HOST}
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_LOCAL_PORT}:5432
+    networks:
+      - go_sandbox

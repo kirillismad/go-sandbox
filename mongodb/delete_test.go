@@ -1,3 +1,5 @@
+//go:build mongodb
+
 package mongodb
 
 import (
@@ -19,7 +21,7 @@ func (s *MongoDBTestSuite) TestDelete() {
 		_, err := s.db.Collection(usersCol).InsertOne(context.TODO(), &user)
 		s.Require().NoError(err)
 
-		_, err = s.db.Collection(usersCol).DeleteOne(context.TODO(), bson.D{{"_id", user.ID}})
+		_, err = s.db.Collection(usersCol).DeleteOne(context.TODO(), bson.D{{Key: "_id", Value: user.ID}})
 		s.Require().NoError(err)
 
 	})
@@ -39,7 +41,7 @@ func (s *MongoDBTestSuite) TestDelete() {
 		r, err := s.db.Collection(usersCol).InsertMany(context.TODO(), users)
 		s.Require().NoError(err)
 
-		_, err = s.db.Collection(usersCol).DeleteMany(context.TODO(), bson.D{{"_id", bson.D{{"$in", r.InsertedIDs}}}})
+		_, err = s.db.Collection(usersCol).DeleteMany(context.TODO(), bson.D{{Key: "_id", Value: bson.D{{Key: "$in", Value: r.InsertedIDs}}}})
 		s.Require().NoError(err)
 	})
 }

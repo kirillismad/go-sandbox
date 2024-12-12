@@ -1,3 +1,5 @@
+//go:build mongodb
+
 package mongodb
 
 import (
@@ -16,7 +18,7 @@ const (
 	uri          = "mongodb://localhost:27017"
 	username     = "usr"
 	password     = "pwd"
-	dbName       = "test"
+	dbName       = "db"
 	usersCol     = "users"
 	locationsCol = "locations"
 	postsCol     = "posts"

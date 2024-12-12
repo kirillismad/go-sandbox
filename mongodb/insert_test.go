@@ -1,3 +1,5 @@
+//go:build mongodb
+
 package mongodb
 
 import (
@@ -63,7 +65,7 @@ func (s *MongoDBTestSuite) TestInsert() {
 		result, err := users.InsertMany(context.TODO(), data, options.InsertMany().SetBypassDocumentValidation(true))
 		s.Require().NoError(err)
 		s.T().Cleanup(func() {
-			r, err := users.DeleteMany(context.TODO(), bson.D{{"_id", bson.D{{"$in", result.InsertedIDs}}}})
+			r, err := users.DeleteMany(context.TODO(), bson.D{{Key: "_id", Value: bson.D{{Key: "$in", Value: result.InsertedIDs}}}})
 			s.Require().NoError(err)
 			s.Require().Equal(int64(len(result.InsertedIDs)), r.DeletedCount)
 		})
@@ -84,7 +86,7 @@ func (s *MongoDBTestSuite) TestInsert() {
 			},
 		)
 		s.T().Cleanup(func() {
-			r, err := users.DeleteOne(context.TODO(), bson.D{{"_id", id}})
+			r, err := users.DeleteOne(context.TODO(), bson.D{{Key: "_id", Value: id}})
 			s.Require().NoError(err)
 			s.Require().Equal(int64(1), r.DeletedCount)
 		})

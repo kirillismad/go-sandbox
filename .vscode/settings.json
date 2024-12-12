@@ -1,0 +1,4 @@
+{
+    "go.buildTags": "redis,mongodb,postgres",
+    "go.testTags": "",
+}
