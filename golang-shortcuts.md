@@ -28,11 +28,11 @@
 - a
 - b
 - c
-- d
+- d = duplicate line
 - e = recent files
 - f = find
 - g = generate ...
-- h
+- h = quick documentation
 - i = organize imports
 - j = show context action
 - k

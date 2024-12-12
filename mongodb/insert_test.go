@@ -3,77 +3,95 @@ package mongodb
 import (
 	"context"
 	fake "github.com/brianvoe/gofakeit/v7"
-	"github.com/stretchr/testify/require"
+	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"testing"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func create(collection *mongo.Collection, item interface{}, t *testing.T) string {
-	result, err := collection.InsertOne(context.TODO(), item)
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		result, err := collection.DeleteOne(context.TODO(), bson.D{{"_id", result.InsertedID}})
-		require.NoError(t, err)
-		require.Equal(t, int64(1), result.DeletedCount)
-	})
-	return result.InsertedID.(string)
-}
+func (s *MongoDBTestSuite) TestInsert() {
+	s.T().Parallel()
 
-func TestInsert(t *testing.T) {
-	t.Parallel()
-
-	t.Run("add user", func(t *testing.T) {
-		t.Parallel()
-
-		r := require.New(t)
-
-		client := getClient(context.TODO(), t)
-
-		t.Cleanup(func() {
-			r.NoError(client.Disconnect(context.TODO()))
-		})
-
+	s.Run("insert user", func() {
 		user := &User{
+			ID:       primitive.NewObjectID(),
 			Username: fake.Username(),
 		}
-		userID := create(client.Database("test").Collection("users"), user, t)
-		user.ID = userID
-		require.NotEmpty(t, user.ID)
+		s.create(s.db.Collection(usersCol), user)
+		s.Require().NotEmpty(user.ID)
 	})
 
-	t.Run("add post", func(t *testing.T) {
-		t.Parallel()
-
-		client := getClient(context.TODO(), t)
-
-		users := client.Database("test").Collection("users")
-		posts := client.Database("test").Collection("posts")
-		locations := client.Database("test").Collection("locations")
+	s.Run("insert post", func() {
+		users := s.db.Collection(usersCol)
+		posts := s.db.Collection(postsCol)
+		locations := s.db.Collection(locationsCol)
 
 		author := User{
+			ID:       primitive.NewObjectID(),
 			Username: fake.Username(),
 		}
-		authorID := create(users, author, t)
-		author.ID = authorID
+		s.create(users, author)
 
 		location := Location{
+			ID:   primitive.NewObjectID(),
 			Name: fake.City(),
 			Lat:  fake.Latitude(),
 			Lon:  fake.Longitude(),
 		}
 
-		locationID := create(locations, location, t)
-		location.ID = locationID
+		s.create(locations, location)
 
 		post := Post{
-			UserID:     authorID,
+			UserID:     author.ID,
 			Text:       fake.Phrase(),
 			CreatedAt:  fake.PastDate(),
 			Tags:       []string{fake.Word(), fake.Word()},
 			LocationID: location.ID,
 		}
-		postID := create(posts, post, t)
-		post.ID = postID
+		s.create(posts, post)
+	})
+	s.Run("insert many", func() {
+		users := s.db.Collection(usersCol)
+
+		data := lo.Times(3, func(i int) interface{} {
+			return &User{
+				ID:       primitive.NewObjectID(),
+				Username: fake.Username(),
+			}
+		})
+		result, err := users.InsertMany(context.TODO(), data, options.InsertMany().SetBypassDocumentValidation(true))
+		s.Require().NoError(err)
+		s.T().Cleanup(func() {
+			r, err := users.DeleteMany(context.TODO(), bson.D{{"_id", bson.D{{"$in", result.InsertedIDs}}}})
+			s.Require().NoError(err)
+			s.Require().Equal(int64(len(result.InsertedIDs)), r.DeletedCount)
+		})
+	})
+
+	s.Run("duplicate key error", func() {
+		const duplicateKeyError = 11000
+
+		users := s.db.Collection(usersCol)
+
+		id := primitive.NewObjectID()
+
+		_, err := users.InsertMany(
+			context.TODO(),
+			[]interface{}{
+				&User{ID: id, Username: fake.Username()},
+				&User{ID: id, Username: fake.Username()},
+			},
+		)
+		s.T().Cleanup(func() {
+			r, err := users.DeleteOne(context.TODO(), bson.D{{"_id", id}})
+			s.Require().NoError(err)
+			s.Require().Equal(int64(1), r.DeletedCount)
+		})
+
+		s.Require().Error(err)
+		var asError mongo.BulkWriteException
+		s.Require().ErrorAs(err, &asError)
+		s.Require().True(asError.HasErrorCode(duplicateKeyError))
 	})
 }
