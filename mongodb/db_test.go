@@ -52,7 +52,13 @@ func (s *MongoDBTestSuite) create(collection *mongo.Collection, item interface{}
 	result, err := collection.InsertOne(context.TODO(), item)
 	s.Require().NoError(err)
 	s.T().Cleanup(func() {
-		r, err := collection.DeleteOne(context.TODO(), bson.D{{"_id", result.InsertedID}})
+		r, err := collection.DeleteOne(
+			context.TODO(),
+			bson.D{{
+				Key:   "_id",
+				Value: result.InsertedID,
+			}},
+		)
 		s.Require().NoError(err)
 		s.Require().Equal(int64(1), r.DeletedCount)
 	})
