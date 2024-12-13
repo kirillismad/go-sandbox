@@ -30,12 +30,12 @@ services:
     image: mongo-express:latest
     restart: unless-stopped
     environment:
-      ME_CONFIG_MONGODB_URL: "mongodb://mongo:27017"
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: admin
       ME_CONFIG_MONGODB_SERVER: ${MONGO_HOST}
+      ME_CONFIG_MONGODB_PORT: ${ME_CONFIG_MONGODB_PORT}
     ports:
       - ${MONGO_EXPRESS_LOCAL_PORT}:8081
     networks:

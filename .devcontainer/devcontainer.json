@@ -4,20 +4,16 @@
 	"name": "Go",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
-	"runServices": [
-		"app"
-	],
+	// "runServices": [
+	// 	"app"
+	// ],
 	"features": {
 		"ghcr.io/devcontainers-extra/features/protoc:1": {},
 		"ghcr.io/marcozac/devcontainer-features/buf:1": {},
 		"ghcr.io/eitsupi/devcontainer-features/go-task:1": {},
 		"ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
 			"theme": "robbyrussell",
-			"plugins": [
-				"git",
-				"zsh-autosuggestions",
-				"zsh-syntax-highlighting"
-			]
+			"plugins": "git"
 		}
 	},
 	"customizations": {
@@ -28,14 +24,4 @@
 			]
 		}
 	}
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "go version",
-	// Configure tool-specific properties.
-	// "customizations": {},
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
 }
