@@ -4,6 +4,9 @@ package rate_limiters_test
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"os"
 	"sandbox/rate_limiters"
 	"testing"
 	"time"
@@ -11,6 +14,20 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/require"
 )
+
+func init() {
+	redisHost = os.Getenv("REDIS_HOST")
+	if redisHost == "" {
+		log.Fatal("REDIS_HOST is not set")
+	}
+	redisPort = os.Getenv("REDIS_HOST")
+	if redisPort == "" {
+		log.Fatal("REDIS_PORT is not set")
+	}
+}
+
+var redisHost string
+var redisPort string
 
 func TestRedisTokenBucketRateLimiter_Acquire(t *testing.T) {
 	t.Parallel()
@@ -21,7 +38,7 @@ func TestRedisTokenBucketRateLimiter_Acquire(t *testing.T) {
 		ctx := context.Background()
 
 		rdb := redis.NewClient(&redis.Options{
-			Addr: "localhost:6379",
+			Addr: fmt.Sprintf("%s:%s", redisHost, redisPort),
 		})
 
 		pingResult, err := rdb.Ping(ctx).Result()

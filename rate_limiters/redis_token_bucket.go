@@ -114,7 +114,7 @@ func (l *RedisTokenBucketRateLimiter) EvalSha(ctx context.Context, keys []string
 			return res, nil
 		}
 
-		if strings.Contains(err.Error(), "NOSCRIPT") {
+		if !strings.Contains(err.Error(), "NOSCRIPT") {
 			return nil, fmt.Errorf("EvalSha: %w", err)
 		}
 
