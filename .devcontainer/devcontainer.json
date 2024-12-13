@@ -22,5 +22,6 @@
 			]
 		}
 	},
+	"postCreateCommand": "go mod download",
 	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"
 }

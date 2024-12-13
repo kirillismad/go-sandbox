@@ -20,7 +20,7 @@ func init() {
 	if redisHost == "" {
 		log.Fatal("REDIS_HOST is not set")
 	}
-	redisPort = os.Getenv("REDIS_HOST")
+	redisPort = os.Getenv("REDIS_PORT")
 	if redisPort == "" {
 		log.Fatal("REDIS_PORT is not set")
 	}

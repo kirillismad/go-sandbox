@@ -9,12 +9,6 @@
 
 - click = go to declaration
 - backspace = delete line
-- up = move caret to previous paragraph
-- down = move caret to next paragraph
-- left = move caret to previous word
-- right = move caret to next word
-- ] **OR** mouse 5 = forward
-- [ **OR** mouse 4 = back
 - enter = start new line
 
 - 1 = project
