@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"errors"
 	"image"
 	"io"
 	"log"
@@ -80,7 +81,7 @@ func (s *GrpcServiceSuite) TestDownload() {
 	var content []byte
 	for {
 		resp, err := stream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		s.Require().NoError(err)

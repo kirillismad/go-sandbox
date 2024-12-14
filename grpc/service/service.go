@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"errors"
 	"image"
 	"io"
 	"sandbox/grpc/gen/pkg/v1"
@@ -18,7 +19,7 @@ type Service struct {
 	pkg.UnimplementedServiceServer
 }
 
-func NewService() *Service {
+func NewService() pkg.ServiceServer {
 	return &Service{}
 }
 
@@ -50,7 +51,8 @@ func (s *Service) Upload(stream pkg.Service_UploadServer) error {
 	var content []byte
 	for {
 		req, err := stream.Recv()
-		if err == io.EOF {
+
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {
