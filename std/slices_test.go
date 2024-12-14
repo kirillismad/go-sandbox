@@ -92,6 +92,20 @@ func TestSlicesAppend(t *testing.T) {
 			t.Logf("slice = %v, len = %d, cap = %d", slice, len(slice), cap(slice))
 		}
 	})
+
+	t.Run("slice slicing out of range", func(t *testing.T) {
+		t.Parallel()
+
+		r := require.New(t)
+
+		var slice = []int{0, 1, 2, 3} // len = 5, cap = 5
+		s1 := slice[2:]               // 2, 3
+
+		r.ElementsMatch([]int{2, 3}, s1)
+		r.Panics(func() {
+			_ = s1[:3] // panic: runtime error: slice bounds out of range [:3] with capacity 2
+		})
+	})
 }
 
 func TestSlicesIndexing(t *testing.T) {

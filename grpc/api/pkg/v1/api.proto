@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package pkg.v1;
+
+option go_package = "sandbox/pkg/v1;pkg";
+
+// Сервис с различными типами RPC
+service Service {
+    // Unary RPC: Клиент отправляет запрос, сервер отвечает единственным ответом
+    rpc Get(GetRequest) returns (GetResponse);
+
+    // Server Streaming RPC: Клиент отправляет запрос, сервер отвечает потоком данных
+    rpc Download(DownloadRequest) returns (stream DownloadResponse);
+    
+    // Client Streaming RPC: Клиент отправляет поток данных, сервер отвечает единственным ответом
+    rpc Upload(stream UploadRequest) returns (UploadResponse);
+
+    // Bidirectional Streaming RPC: Клиент и сервер обмениваются потоками данных
+    rpc Chat(stream MessageRequest) returns (stream MessageResponse);
+}
+
+
+message GetRequest {
+    int64 id = 1;
+}
+
+message GetResponse {
+    int64 id = 1;
+    string text = 2;
+}
+
+message DownloadRequest {
+    int64 width = 1;
+    int64 height = 2;
+}
+
+message DownloadResponse {
+    bytes chunk = 1;
+}
+
+message UploadRequest {
+    bytes chunk = 1;
+}
+
+message UploadResponse {
+    int64 size = 1;
+}
+
+message MessageRequest {
+    string text = 1;
+}
+
+message MessageResponse {
+    string text = 1;
+}

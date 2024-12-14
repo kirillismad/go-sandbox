@@ -11,32 +11,32 @@
 - backspace = delete line
 - enter = start new line
 
-- a
+- a = select all
 - b
-- c
+- c = copy
 - d = duplicate line
-- e 
+- e = reveal Active File in Explorer View
 - f = find
 - g 
 - h
 - i = organize imports
 - j = navigate editors tab
-- k
+- k = go to symbol in workspace
 - l = format code
 - m
 - n = new file
-- o 
+- o = go to file in workspace
 - p = parameter info
 - q
 - r = replace
-- s
+- s = save
 - t
 - u = quick fix
-- v
+- v = paste
 - w = close tab
-- x
+- x = cut
 - y
-- z
+- z = undo
 
 - / = comment with line comment
 
@@ -45,7 +45,10 @@
 - 1 = focus explorer
 - 3 = focus terminal
 
-## SHIFT-CTRL
+- up = move line up
+- down = move line down
+
+## CTRL-SHIFT
 
 - n = new directory
 
