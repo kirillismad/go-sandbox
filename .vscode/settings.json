@@ -1,3 +1,6 @@
 {
     "go.buildTags": "redis,mongodb,postgres",
+    "go.testFlags": [
+        "-v"
+    ]
 }

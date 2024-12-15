@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/resolver"
 )
 
-var servers = []string{"localhost:50051", "localhost:50052"}
+var servers = []string{"localhost:50051"}
 
 type staticResolverBuilder struct {
 	addresses map[string][]string

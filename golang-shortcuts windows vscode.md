@@ -27,7 +27,7 @@
 - n = new file
 - o = go to file in workspace
 - p = parameter info
-- q
+- q = show hover
 - r = replace
 - s = save
 - t
