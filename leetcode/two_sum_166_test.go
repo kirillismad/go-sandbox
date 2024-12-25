@@ -7,6 +7,8 @@ import (
 )
 
 func Test_twoSum1(t *testing.T) {
+	t.Parallel()
+
 	cases := []struct {
 		numbers []int
 		target  int

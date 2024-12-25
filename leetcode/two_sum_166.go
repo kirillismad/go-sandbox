@@ -7,10 +7,10 @@ func twoSum1(numbers []int, target int) []int {
 	left := 0
 	right := len(numbers) - 1
 	for left < right {
-		switch {
-		case numbers[left]+numbers[right] < target:
+		switch sum := numbers[left] + numbers[right]; {
+		case sum < target:
 			left++
-		case numbers[left]+numbers[right] > target:
+		case sum > target:
 			right--
 		default:
 			return []int{left + 1, right + 1}
