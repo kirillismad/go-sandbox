@@ -15,16 +15,16 @@ func Test_reverseList(t *testing.T) {
 		want *ListNode
 	}{
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: nil}}},
-			want: &ListNode{Val: 3, Next: &ListNode{Val: 2, Next: &ListNode{Val: 1, Next: nil}}},
+			head: NewList([]int{1, 2, 3}),
+			want: NewList([]int{3, 2, 1}),
 		},
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: nil}},
-			want: &ListNode{Val: 2, Next: &ListNode{Val: 1, Next: nil}},
+			head: NewList([]int{1, 2}),
+			want: NewList([]int{2, 1}),
 		},
 		{
-			head: &ListNode{Val: 1, Next: nil},
-			want: &ListNode{Val: 1, Next: nil},
+			head: NewList([]int{1}),
+			want: NewList([]int{1}),
 		},
 		{
 			head: nil,
