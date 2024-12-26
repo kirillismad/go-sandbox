@@ -15,15 +15,15 @@ func Test_isPalindrome(t *testing.T) {
 		want bool
 	}{
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 2, Next: &ListNode{Val: 1}}}},
+			head: NewList([]int{1, 2, 2, 1}),
 			want: true,
 		},
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: &ListNode{Val: 2, Next: &ListNode{Val: 1}}}}},
+			head: NewList([]int{1, 2, 3, 2, 1}),
 			want: true,
 		},
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: &ListNode{Val: 4, Next: &ListNode{Val: 1}}}}},
+			head: NewList([]int{1, 2, 3, 4, 1}),
 			want: false,
 		},
 	}

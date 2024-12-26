@@ -15,12 +15,12 @@ func Test_middleNode(t *testing.T) {
 		want *ListNode
 	}{
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: &ListNode{Val: 4, Next: &ListNode{Val: 5}}}}},
-			want: &ListNode{Val: 3, Next: &ListNode{Val: 4, Next: &ListNode{Val: 5}}},
+			head: NewList([]int{1, 2, 3, 4, 5}),
+			want: NewList([]int{3, 4, 5}),
 		},
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: &ListNode{Val: 4, Next: &ListNode{Val: 5, Next: &ListNode{Val: 6}}}}}},
-			want: &ListNode{Val: 4, Next: &ListNode{Val: 5, Next: &ListNode{Val: 6}}},
+			head: NewList([]int{1, 2, 3, 4, 5, 6}),
+			want: NewList([]int{4, 5, 6}),
 		},
 	}
 	for i, tt := range tests {

@@ -14,14 +14,13 @@ func Test_reorderList(t *testing.T) {
 		want *ListNode
 	}{
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: &ListNode{Val: 4}}}},
-			want: &ListNode{Val: 1, Next: &ListNode{Val: 4, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3}}}},
+			head: NewList([]int{1, 2, 3, 4}),
+			want: NewList([]int{1, 4, 2, 3}),
 		},
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3}}},
-			want: &ListNode{Val: 1, Next: &ListNode{Val: 3, Next: &ListNode{Val: 2}}},
+			head: NewList([]int{1, 2, 3}),
+			want: NewList([]int{1, 3, 2}),
 		},
-		{},
 	}
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {

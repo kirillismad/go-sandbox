@@ -16,18 +16,17 @@ func Test_removeNthFromEnd(t *testing.T) {
 		want *ListNode
 	}{
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: &ListNode{Val: 4, Next: &ListNode{Val: 5}}}}},
+			head: NewList([]int{1, 2, 3, 4, 5}),
 			n:    2,
-			want: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: &ListNode{Val: 5}}}},
+			want: NewList([]int{1, 2, 3, 5}),
 		},
 		{
-			head: &ListNode{Val: 1, Next: &ListNode{Val: 2}},
+			head: NewList([]int{1, 2}),
 			n:    1,
-			want: &ListNode{Val: 1},
+			want: NewList([]int{1}),
 		},
-
 		{
-			head: &ListNode{Val: 1},
+			head: NewList([]int{1}),
 			n:    1,
 			want: nil,
 		},

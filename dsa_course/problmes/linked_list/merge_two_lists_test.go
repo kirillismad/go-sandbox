@@ -15,19 +15,19 @@ func Test_mergeTwoLists(t *testing.T) {
 		want *ListNode
 	}{
 		{
-			a:    &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 4, Next: nil}}},
-			b:    &ListNode{Val: 1, Next: &ListNode{Val: 3, Next: &ListNode{Val: 4, Next: nil}}},
-			want: &ListNode{Val: 1, Next: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: &ListNode{Val: 4, Next: &ListNode{Val: 4, Next: nil}}}}}},
+			a:    NewList([]int{1, 2, 4}),
+			b:    NewList([]int{1, 3, 4}),
+			want: NewList([]int{1, 1, 2, 3, 4, 4}),
 		},
 		{
-			a:    &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: nil}},
-			b:    &ListNode{Val: 1, Next: &ListNode{Val: 3, Next: nil}},
-			want: &ListNode{Val: 1, Next: &ListNode{Val: 1, Next: &ListNode{Val: 2, Next: &ListNode{Val: 3, Next: nil}}}},
+			a:    NewList([]int{1, 2}),
+			b:    NewList([]int{1, 3}),
+			want: NewList([]int{1, 1, 2, 3}),
 		},
 		{
-			a:    &ListNode{Val: 1, Next: nil},
+			a:    NewList([]int{1}),
 			b:    nil,
-			want: &ListNode{Val: 1, Next: nil},
+			want: NewList([]int{1}),
 		},
 	}
 	for i, tt := range tests {
