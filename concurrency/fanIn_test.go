@@ -5,6 +5,9 @@ import (
 	"slices"
 	"testing"
 	"time"
+
+	"github.com/samber/lo"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFanIn(t *testing.T) {
@@ -53,4 +56,33 @@ func TestFanInCancel1(t *testing.T) {
 	if _, ok := <-out; ok {
 		t.Error("out channel is not closed")
 	}
+}
+
+func TestFanInSimple(t *testing.T) {
+	t.Parallel()
+
+	ch1 := make(chan int)
+	ch2 := make(chan int)
+
+	want := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	go func() {
+		defer close(ch1)
+		defer close(ch2)
+
+		for _, v := range want {
+			if v%2 == 0 {
+				ch1 <- v
+			} else {
+				ch2 <- v
+			}
+		}
+
+	}()
+
+	out := FanInSimple(ch1, ch2)
+
+	res := lo.ChannelToSlice(out)
+
+	require.ElementsMatch(t, want, res)
 }

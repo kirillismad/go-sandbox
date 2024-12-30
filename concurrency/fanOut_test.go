@@ -5,6 +5,9 @@ import (
 	"slices"
 	"sync"
 	"testing"
+
+	"github.com/samber/lo"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFanOut(t *testing.T) {
@@ -73,5 +76,32 @@ func TestFanOutCancel2(t *testing.T) {
 		if _, ok := <-out; ok {
 			t.Errorf("channel[%v] is not closed", i)
 		}
+	}
+}
+
+func TestFanOutBroadcast(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	want := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	outs := FanOutBroadcast(ctx, lo.SliceToChannel(0, want), 3)
+
+	result := make([][]int, len(outs))
+
+	var wg sync.WaitGroup
+	for i, out := range outs {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			result[i] = lo.ChannelToSlice(out)
+		}()
+	}
+	wg.Wait()
+
+	for i, r := range result {
+		require.ElementsMatch(t, want, r, "result[%v] is not equal to want", i)
 	}
 }

@@ -40,3 +40,27 @@ func FanIn[T any](ctx context.Context, ins ...<-chan T) <-chan T {
 
 	return out
 }
+
+func FanInSimple[T any](ins ...<-chan T) <-chan T {
+	out := make(chan T)
+
+	go func() {
+		defer close(out)
+
+		var wg sync.WaitGroup
+		wg.Add(len(ins))
+
+		for _, ch := range ins {
+			ch := ch
+			go func() {
+				defer wg.Done()
+				for e := range ch {
+					out <- e
+				}
+			}()
+		}
+		wg.Wait()
+	}()
+
+	return out
+}

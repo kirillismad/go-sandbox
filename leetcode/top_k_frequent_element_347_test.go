@@ -1,8 +1,9 @@
 package leetcode
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_topKFrequent(t *testing.T) {
@@ -10,5 +11,5 @@ func Test_topKFrequent(t *testing.T) {
 	k := 2
 	result := topKFrequent(nums, k)
 
-	fmt.Printf("topKFrequent(%v, %v) = %v\n", nums, k, result)
+	require.Equal(t, []int{2, 1}, result)
 }
