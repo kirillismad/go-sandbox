@@ -9,24 +9,27 @@ import (
 )
 
 func TestAtomicInsteadLock(t *testing.T) {
-	var c atomic.Uint64
+	t.Parallel()
 
+	var c atomic.Uint64
+	var res atomic.Int64
 	fn := func() {
-		t.Log("call")
+		res.Add(1)
 	}
 
-	const cnt = 10
+	const cnt = 30
+	const div = 3
 	var wg sync.WaitGroup
 	wg.Add(cnt)
 	for i := 0; i < cnt; i++ {
 		go func() {
 			defer wg.Done()
 
-			if c.Add(1)%3 == 0 {
+			if c.Add(1)%div == 0 {
 				fn()
 			}
 		}()
 	}
 	wg.Wait()
-	require.Equal(t, int32(10), c.Load())
+	require.Equal(t, int64(cnt/div), res.Load())
 }
