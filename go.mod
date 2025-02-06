@@ -20,6 +20,8 @@ require (
 	google.golang.org/protobuf v1.35.2
 )
 
+require github.com/confluentinc/confluent-kafka-go/v2 v2.8.0
+
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

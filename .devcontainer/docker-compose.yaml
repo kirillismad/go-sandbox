@@ -1,6 +1,3 @@
-networks:
-  go_sandbox:
-
 services:
   app:
     image: mcr.microsoft.com/devcontainers/go:1-1.23-bookworm
@@ -16,24 +13,20 @@ services:
     volumes:
       - ../..:/workspaces:cached
     command: sleep infinity
-    networks:
-      - go_sandbox
   
   mongo:
     hostname: ${MONGO_HOST}
-    image: mongo:latest
+    image: mongo:8
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
       - ${MONGO_LOCAL_PORT}:27017
-    networks:
-      - go_sandbox
 
   mongo_express:
     hostname: ${MONGO_EXPRESS_HOST}
-    image: mongo-express:latest
+    image: mongo-express:1
     restart: unless-stopped
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
@@ -44,21 +37,17 @@ services:
       ME_CONFIG_MONGODB_PORT: ${MONGO_PORT}
     ports:
       - ${MONGO_EXPRESS_LOCAL_PORT}:8081
-    networks:
-      - go_sandbox
   
   redis:
     hostname: ${REDIS_HOST}
-    image: redis:latest
+    image: redis:7
     restart: unless-stopped
     ports:
       - ${REDIS_LOCAL_PORT}:6379
-    networks:
-      - go_sandbox
 
   postgres:
     hostname: ${POSTGRES_HOST}
-    image: postgres:latest
+    image: postgres:17
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -66,5 +55,26 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - ${POSTGRES_LOCAL_PORT}:5432
-    networks:
-      - go_sandbox
+
+  kafka:
+    image: apache/kafka:3.9.0
+    hostname: ${KAFKA_HOST}
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_HOST}:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@${KAFKA_HOST}:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 5000
+      KAFKA_NUM_PARTITIONS: 2
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+  
