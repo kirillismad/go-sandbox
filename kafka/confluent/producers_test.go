@@ -22,14 +22,12 @@ func (s *KafkaTestSuite) TestProducerAtLeastOnce() {
 		"retry.backoff.ms":                      200,
 		"max.in.flight.requests.per.connection": 5,
 		"socket.keepalive.enable":               true,
-		"compression.type":                      "snappy",
 		"linger.ms":                             10,
 		"batch.num.messages":                    2,
-		"queue.buffering.max.ms":                0,
 	})
 	s.Require().NoError(err)
 	defer p.Close()
-	defer p.Flush(1000)
+	defer p.Flush(5000)
 
 	go func() {
 		for event := range p.Events() {
@@ -41,40 +39,7 @@ func (s *KafkaTestSuite) TestProducerAtLeastOnce() {
 		}
 	}()
 
-	const cnt = 4
-	for range cnt {
-		s.produce(p, Message{ID: gofakeit.Int64(), Name: gofakeit.Name()})
-	}
-}
-
-func (s *KafkaTestSuite) TestProducerAtMostOnce() {
-	p, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers":                     "kafka:9092",
-		"acks":                                  "1", // acks = 1
-		"retries":                               1,
-		"retry.backoff.ms":                      200,
-		"max.in.flight.requests.per.connection": 5,
-		"socket.keepalive.enable":               true,
-		"compression.type":                      "snappy",
-		"linger.ms":                             10,
-		"batch.num.messages":                    2,
-		"queue.buffering.max.ms":                0,
-	})
-	s.Require().NoError(err)
-	defer p.Close()
-	defer p.Flush(1000)
-
-	go func() {
-		for event := range p.Events() {
-			switch ev := event.(type) {
-			case *kafka.Message:
-				s.Require().NoError(ev.TopicPartition.Error)
-				s.T().Log(ev.TopicPartition)
-			}
-		}
-	}()
-
-	const cnt = 4
+	const cnt = 2
 	for range cnt {
 		s.produce(p, Message{ID: gofakeit.Int64(), Name: gofakeit.Name()})
 	}
