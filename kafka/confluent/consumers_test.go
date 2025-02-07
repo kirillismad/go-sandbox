@@ -13,10 +13,10 @@ import (
 
 func (s *KafkaTestSuite) TestConsumerAtLeastOnce() {
 	config := &kafka.ConfigMap{
-		"bootstrap.servers":  "kafka:9092",
-		"group.id":           "consumer-group-1",
-		"auto.offset.reset":  "earliest", // earliest - читать с начала, если нет коммита
-		"enable.auto.commit": false,      // Коммиты делаем вручную
+		"bootstrap.servers": "kafka:9092",
+		"group.id":          "consumer-group-1",
+		// "auto.offset.reset":  "earliest", // earliest - читать с начала, если нет коммита
+		"enable.auto.commit": false, // Коммиты делаем вручную
 	}
 
 	с, err := kafka.NewConsumer(config)
@@ -29,7 +29,8 @@ func (s *KafkaTestSuite) TestConsumerAtLeastOnce() {
 
 	// Контекст для graceful shutdown
 
-	for range 4 {
+	for range 5 {
+
 		msg, err := с.ReadMessage(3000 * time.Millisecond)
 		if err != nil {
 			if e, ok := lo.ErrorsAs[kafka.Error](err); ok && e.IsTimeout() {
