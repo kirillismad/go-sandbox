@@ -1,8 +1,8 @@
 package confluent
 
 import (
-	"encoding/binary"
 	"encoding/json"
+	"strconv"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
@@ -49,11 +49,10 @@ func (s *KafkaTestSuite) produce(p *kafka.Producer, msg Message) {
 	content, err := json.Marshal(msg)
 	s.Require().NoError(err)
 
-	buf := make([]byte, binary.MaxVarintLen64)
 	err = p.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: lo.ToPtr(topic), Partition: kafka.PartitionAny},
 		Value:          content,
-		Key:            buf[:binary.PutVarint(buf, msg.ID)],
+		Key:            []byte(strconv.FormatInt(msg.ID, 10)),
 		Headers: []kafka.Header{
 			{
 				Key:   "x-custom-header",
