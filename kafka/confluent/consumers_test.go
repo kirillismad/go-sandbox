@@ -30,8 +30,7 @@ func (s *KafkaTestSuite) TestConsumerAtLeastOnce() {
 	s.Require().NoError(err)
 	defer с.Close()
 
-	topics := []string{topic}
-	err = с.SubscribeTopics(topics, nil)
+	err = с.SubscribeTopics([]string{topic}, nil)
 	s.Require().NoError(err)
 
 	// Контекст для graceful shutdown
