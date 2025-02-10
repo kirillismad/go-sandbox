@@ -4,6 +4,10 @@
 	"name": "Go",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
+	"runServices": [
+		"app",
+		"kafka"
+	],
 	"features": {
 		"ghcr.io/devcontainers-extra/features/protoc:1": {},
 		"ghcr.io/marcozac/devcontainer-features/buf:1": {},
@@ -22,5 +26,5 @@
 			]
 		}
 	},
-	"postCreateCommand": "task init"
+	"postCreateCommand": "task init",
 }
