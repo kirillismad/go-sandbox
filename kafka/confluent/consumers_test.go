@@ -11,6 +11,13 @@ import (
 	"github.com/samber/lo"
 )
 
+func IsTimeout(err error) bool {
+	if e, ok := lo.ErrorsAs[kafka.Error](err); ok && e.IsTimeout() {
+		return true
+	}
+	return false
+}
+
 func (s *KafkaTestSuite) TestConsumerAtLeastOnce() {
 	config := &kafka.ConfigMap{
 		"bootstrap.servers": "kafka:9092",
@@ -23,17 +30,15 @@ func (s *KafkaTestSuite) TestConsumerAtLeastOnce() {
 	s.Require().NoError(err)
 	defer с.Close()
 
-	topics := []string{topic}
-	err = с.SubscribeTopics(topics, nil)
+	err = с.SubscribeTopics([]string{topic}, nil)
 	s.Require().NoError(err)
 
 	// Контекст для graceful shutdown
 
-	for range 5 {
-
-		msg, err := с.ReadMessage(3000 * time.Millisecond)
+	for range 2 {
+		msg, err := с.ReadMessage(5 * time.Second)
 		if err != nil {
-			if e, ok := lo.ErrorsAs[kafka.Error](err); ok && e.IsTimeout() {
+			if IsTimeout(err) {
 				s.T().Log("skip")
 				continue
 			}
@@ -55,8 +60,7 @@ func (s *KafkaTestSuite) TestConsumerAtLeastOnce() {
 			msg.TopicPartition.Offset,
 		)
 
-		с.CommitMessage(msg)
+		_, err = с.CommitMessage(msg)
 		s.Require().NoError(err)
 	}
-
 }

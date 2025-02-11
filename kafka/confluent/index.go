@@ -1,3 +1,3 @@
 package confluent
 
-const topic = "test_topic"
+const topic = "confluent-topic"
