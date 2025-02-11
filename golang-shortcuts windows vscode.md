@@ -5,7 +5,7 @@
 - F1 = find action
 - F2 = rename
 
-## CTRL
+## CTRL/CMD
 
 - click = go to declaration
 - backspace = delete line
@@ -18,16 +18,16 @@
 - e = reveal Active File in Explorer View
 - f = find
 - g 
-- h
+- h = Show Definition Preview Hover
 - i = organize imports
-- j = navigate editors tab
+- j 
 - k = go to symbol in workspace
 - l = format code
 - m
 - n = new file
 - o = go to file in workspace
 - p = parameter info
-- q = show hover
+- q 
 - r = replace
 - s = save
 - t
@@ -50,7 +50,7 @@
 
 ## CTRL-SHIFT
 
-- n = new directory
+- n = new folder
 
 ## ALT-SHIFT
 

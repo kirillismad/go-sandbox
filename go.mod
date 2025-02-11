@@ -20,12 +20,12 @@ require (
 	google.golang.org/protobuf v1.35.2
 )
 
-require github.com/confluentinc/confluent-kafka-go/v2 v2.8.0
-
 require (
-	github.com/pierrec/lz4/v4 v4.1.22 // indirect
-	github.com/segmentio/kafka-go v0.4.47 // indirect
+	github.com/confluentinc/confluent-kafka-go/v2 v2.8.0
+	github.com/segmentio/kafka-go v0.4.47
 )
+
+require github.com/pierrec/lz4/v4 v4.1.22 // indirect
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
