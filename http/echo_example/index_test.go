@@ -3,6 +3,7 @@ package echo_example
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,19 +15,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/suite"
+	"golang.org/x/net/http2"
 )
 
 type EchoSuite struct {
 	suite.Suite
 	server *echo.Echo
 	ch     <-chan error
+	client *http.Client
 }
 
 func (s *EchoSuite) SetupSuite() {
 	s.server = BuildServer()
 
 	s.ch = lo.Async(func() error {
-		err := s.server.Start(":8080")
+		err := s.server.StartTLS(":8080", "./testdata/cert.pem", "./testdata/key.pem")
 		if err != nil && err != http.ErrServerClosed {
 			return err
 		}
@@ -36,6 +39,15 @@ func (s *EchoSuite) SetupSuite() {
 	case err := <-s.ch:
 		s.Require().NoError(err)
 	case <-time.After(2 * time.Second):
+	}
+	s.client = &http.Client{
+		Transport: &http2.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+			IdleConnTimeout: 20 * time.Second,
+		},
+		Timeout: 10 * time.Second,
 	}
 	s.T().Cleanup(func() {
 		select {
@@ -61,12 +73,11 @@ func (s *EchoSuite) createTestItem() Item {
 	body, err := json.Marshal(item)
 	s.Require().NoError(err)
 
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:8080/items", bytes.NewBuffer(body))
+	req, err := http.NewRequest(http.MethodPost, "https://localhost:8080/items", bytes.NewBuffer(body))
 	s.Require().NoError(err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
@@ -85,11 +96,10 @@ func (s *EchoSuite) TestCreateItem() {
 }
 
 func (s *EchoSuite) TestGetList() {
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:8080/items", nil)
+	req, err := http.NewRequest(http.MethodGet, "https://localhost:8080/items", nil)
 	s.Require().NoError(err)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
@@ -99,11 +109,10 @@ func (s *EchoSuite) TestGetList() {
 func (s *EchoSuite) TestDeleteItem() {
 	item := s.createTestItem()
 
-	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:8080/items/%d", item.ID), nil)
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("https://localhost:8080/items/%d", item.ID), nil)
 	s.Require().NoError(err)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
@@ -117,12 +126,11 @@ func (s *EchoSuite) TestUpdateItem() {
 	body, err := json.Marshal(item)
 	s.Require().NoError(err)
 
-	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("http://localhost:8080/items/%d", item.ID), bytes.NewBuffer(body))
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("https://localhost:8080/items/%d", item.ID), bytes.NewBuffer(body))
 	s.Require().NoError(err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
@@ -132,11 +140,10 @@ func (s *EchoSuite) TestUpdateItem() {
 func (s *EchoSuite) TestGetSingle() {
 	item := s.createTestItem()
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:8080/items/%d", item.ID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://localhost:8080/items/%d", item.ID), nil)
 	s.Require().NoError(err)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
@@ -144,11 +151,10 @@ func (s *EchoSuite) TestGetSingle() {
 }
 
 func (s *EchoSuite) TestGetSingleNotFound() {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:8080/items/%d", gofakeit.Int64()), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://localhost:8080/items/%d", gofakeit.Int64()), nil)
 	s.Require().NoError(err)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
@@ -156,12 +162,11 @@ func (s *EchoSuite) TestGetSingleNotFound() {
 }
 
 func (s *EchoSuite) TestUpdateItemNotFound() {
-	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("http://localhost:8080/items/%d", gofakeit.Int64()), nil)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("https://localhost:8080/items/%d", gofakeit.Int64()), nil)
 	s.Require().NoError(err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
