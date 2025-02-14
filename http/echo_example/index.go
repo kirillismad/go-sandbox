@@ -10,6 +10,7 @@ import (
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/samber/lo"
 	"go.uber.org/zap"
 )
 
@@ -26,6 +27,25 @@ var (
 	storage = make(map[int64]*Item)
 	mu      sync.RWMutex
 )
+
+func get(id int64) (*Item, bool) {
+	mu.RLock()
+	item, exists := storage[id]
+	mu.RUnlock()
+	return item, exists
+}
+
+func set(id int64, item *Item) {
+	mu.Lock()
+	storage[id] = item
+	mu.Unlock()
+}
+
+func del(id int64) {
+	mu.Lock()
+	delete(storage, id)
+	mu.Unlock()
+}
 
 func fatalIfErr(err error) {
 	if err != nil {
@@ -44,9 +64,7 @@ func getSingle(c echo.Context) error {
 		logger.Error("Failed to parse ID", zap.Error(err))
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
 	}
-	mu.RLock()
-	item, exists := storage[id]
-	mu.RUnlock()
+	item, exists := get(id)
 	if !exists {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Item not found"})
 	}
@@ -55,10 +73,7 @@ func getSingle(c echo.Context) error {
 
 func getList(c echo.Context) error {
 	mu.RLock()
-	var items []*Item
-	for _, item := range storage {
-		items = append(items, item)
-	}
+	items := lo.Values(storage)
 	mu.RUnlock()
 	return c.JSON(http.StatusOK, items)
 }
@@ -71,9 +86,7 @@ func createItem(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid input"})
 	}
 	item.ID = gofakeit.Int64()
-	mu.Lock()
-	storage[item.ID] = &item
-	mu.Unlock()
+	set(item.ID, &item)
 	return c.JSON(http.StatusCreated, item)
 }
 
@@ -84,9 +97,7 @@ func deleteItem(c echo.Context) error {
 		logger.Error("Failed to parse ID", zap.Error(err))
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
 	}
-	mu.Lock()
-	delete(storage, id)
-	mu.Unlock()
+	del(id)
 	return c.NoContent(http.StatusNoContent)
 }
 

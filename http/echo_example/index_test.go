@@ -25,6 +25,10 @@ type EchoSuite struct {
 	client *http.Client
 }
 
+func TestEchoSuite(t *testing.T) {
+	suite.Run(t, new(EchoSuite))
+}
+
 func (s *EchoSuite) SetupSuite() {
 	s.server = BuildServer()
 
@@ -171,8 +175,4 @@ func (s *EchoSuite) TestUpdateItemNotFound() {
 	defer resp.Body.Close()
 
 	s.Equal(http.StatusNotFound, resp.StatusCode)
-}
-
-func TestEchoSuite(t *testing.T) {
-	suite.Run(t, new(EchoSuite))
 }

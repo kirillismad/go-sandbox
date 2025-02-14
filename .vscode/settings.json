@@ -2,5 +2,17 @@
     "go.buildTags": "redis,mongodb,postgres,kafka",
     "go.testFlags": [
         "-v"
+    ],
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "postgres",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "postgres",
+            "database": "db",
+            "username": "usr",
+            "password": "pwd"
+        }
     ]
 }
