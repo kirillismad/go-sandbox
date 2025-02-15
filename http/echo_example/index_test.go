@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -30,6 +31,11 @@ func TestEchoSuite(t *testing.T) {
 }
 
 func (s *EchoSuite) SetupSuite() {
+	path, err := filepath.Abs("./testdata/websocket.png")
+	s.Require().NoError(err)
+
+	s.T().Setenv("ECHO_EXAMPLE_FILE_PATH", path)
+
 	s.server = BuildServer()
 
 	s.ch = lo.Async(func() error {
@@ -46,12 +52,9 @@ func (s *EchoSuite) SetupSuite() {
 	}
 	s.client = &http.Client{
 		Transport: &http2.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-			IdleConnTimeout: 20 * time.Second,
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			AllowHTTP:       true,
 		},
-		Timeout: 10 * time.Second,
 	}
 	s.T().Cleanup(func() {
 		select {
@@ -66,54 +69,50 @@ func (s *EchoSuite) SetupSuite() {
 	})
 }
 
-func (s *EchoSuite) createTestItem() Item {
-	item := Item{
-		FInt:    gofakeit.Int64(),
-		FFloat:  gofakeit.Float64(),
-		FString: gofakeit.Word(),
-		FBool:   gofakeit.Bool(),
-		FSlice:  []map[string]interface{}{{"key": gofakeit.Int64(), "value": gofakeit.Word()}},
+func (s *EchoSuite) TestCreateProduct() {
+	product := Product{
+		ID:       gofakeit.Int64(),
+		Total:    gofakeit.Int64(),
+		Interest: gofakeit.Float64(),
+		Title:    gofakeit.Sentence(3),
+		IsActive: gofakeit.Bool(),
+		Content: []map[string]interface{}{
+			{"key": gofakeit.Int8(), "value": gofakeit.Word()},
+			{"key": gofakeit.Int8(), "value": gofakeit.Word()},
+		},
 	}
-	body, err := json.Marshal(item)
+	body, err := json.Marshal(product)
 	s.Require().NoError(err)
-
-	req, err := http.NewRequest(http.MethodPost, "https://localhost:8080/items", bytes.NewBuffer(body))
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:8080/products", bytes.NewBuffer(body))
 	s.Require().NoError(err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-
 	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
-	body, err = io.ReadAll(resp.Body)
-	s.Require().NoError(err)
-
-	err = json.Unmarshal(body, &item)
-	s.Require().NoError(err)
-
 	s.Equal(http.StatusCreated, resp.StatusCode)
-	return item
-}
-
-func (s *EchoSuite) TestCreateItem() {
-	s.createTestItem()
 }
 
 func (s *EchoSuite) TestGetList() {
-	req, err := http.NewRequest(http.MethodGet, "https://localhost:8080/items", nil)
+	req, err := http.NewRequest(http.MethodGet, "https://localhost:8080/products", nil)
 	s.Require().NoError(err)
 
 	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	s.Require().NoError(err)
+
+	var products []Product
+	err = json.Unmarshal(body, &products)
+	s.Require().NoError(err)
 
 	s.Equal(http.StatusOK, resp.StatusCode)
 }
 
 func (s *EchoSuite) TestDeleteItem() {
-	item := s.createTestItem()
-
-	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("https://localhost:8080/items/%d", item.ID), nil)
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("https://localhost:8080/products/%d", gofakeit.Int64()), nil)
 	s.Require().NoError(err)
 
 	resp, err := s.client.Do(req)
@@ -124,16 +123,22 @@ func (s *EchoSuite) TestDeleteItem() {
 }
 
 func (s *EchoSuite) TestUpdateItem() {
-	item := s.createTestItem()
-
-	item.FString = gofakeit.Word()
-	body, err := json.Marshal(item)
+	product := Product{
+		ID:       gofakeit.Int64(),
+		Total:    gofakeit.Int64(),
+		Interest: gofakeit.Float64(),
+		Title:    gofakeit.Sentence(3),
+		IsActive: gofakeit.Bool(),
+		Content: []map[string]interface{}{
+			{"key": gofakeit.Int8(), "value": gofakeit.Word()},
+			{"key": gofakeit.Int8(), "value": gofakeit.Word()},
+		},
+	}
+	body, err := json.Marshal(product)
 	s.Require().NoError(err)
-
-	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("https://localhost:8080/items/%d", item.ID), bytes.NewBuffer(body))
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("https://localhost:8080/products/%d", product.ID), bytes.NewBuffer(body))
 	s.Require().NoError(err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-
 	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
@@ -142,37 +147,54 @@ func (s *EchoSuite) TestUpdateItem() {
 }
 
 func (s *EchoSuite) TestGetSingle() {
-	item := s.createTestItem()
-
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://localhost:8080/items/%d", item.ID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://localhost:8080/products/%d", gofakeit.Int64()), nil)
 	s.Require().NoError(err)
-
 	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	s.Require().NoError(err)
+
+	var product Product
+	err = json.Unmarshal(body, &product)
+	s.Require().NoError(err)
 
 	s.Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *EchoSuite) TestGetSingleNotFound() {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://localhost:8080/items/%d", gofakeit.Int64()), nil)
+func (s *EchoSuite) TestDownloadFile() {
+	req, err := http.NewRequest(http.MethodGet, "https://localhost:8080/file", nil)
 	s.Require().NoError(err)
-
 	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
-	s.Equal(http.StatusNotFound, resp.StatusCode)
+	s.T().Logf("Header: %v", resp.Header)
+
+	s.Equal(http.StatusOK, resp.StatusCode)
 }
 
-func (s *EchoSuite) TestUpdateItemNotFound() {
-	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("https://localhost:8080/items/%d", gofakeit.Int64()), nil)
+func (s *EchoSuite) TestAttachmentFile() {
+	req, err := http.NewRequest(http.MethodGet, "https://localhost:8080/attachment", nil)
 	s.Require().NoError(err)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-
 	resp, err := s.client.Do(req)
 	s.Require().NoError(err)
 	defer resp.Body.Close()
 
-	s.Equal(http.StatusNotFound, resp.StatusCode)
+	s.T().Logf("Header: %v", resp.Header)
+
+	s.Equal(http.StatusOK, resp.StatusCode)
+}
+
+func (s *EchoSuite) TestStream() {
+	req, err := http.NewRequest(http.MethodGet, "https://localhost:8080/stream", nil)
+	s.Require().NoError(err)
+	resp, err := s.client.Do(req)
+	s.Require().NoError(err)
+	defer resp.Body.Close()
+
+	s.T().Logf("Header: %v", resp.Header)
+
+	s.Equal(http.StatusOK, resp.StatusCode)
 }
