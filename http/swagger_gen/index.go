@@ -1,14 +1,12 @@
 package swaggergenerated
 
 import (
-	"log"
-	"sandbox/http/swagger_generated/models"
-	"sandbox/http/swagger_generated/restapi"
-	"sandbox/http/swagger_generated/restapi/operations"
-	"sandbox/http/swagger_generated/restapi/operations/products"
+	"os"
+	"sandbox/http/swagger_gen/models"
+	"sandbox/http/swagger_gen/restapi/operations/files"
+	"sandbox/http/swagger_gen/restapi/operations/products"
 
 	"github.com/brianvoe/gofakeit/v7"
-	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/samber/lo"
 )
@@ -45,20 +43,24 @@ func ListProductsHandler(p products.ListProductsParams) middleware.Responder {
 	}))
 }
 
-func NewServer() (*restapi.Server, func() error) {
-	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
+func UpdateProductHandler(p products.UpdateProductParams) middleware.Responder {
+	return products.NewUpdateProductOK().WithPayload(&models.EchoExampleProduct{
+		ID:       p.ID,
+		Interest: gofakeit.Float64(),
+		IsActive: gofakeit.Bool(),
+		Title:    gofakeit.Sentence(3),
+		Total:    gofakeit.Int64(),
+	})
+}
+
+func DeleteProductHandler(p products.DeleteProductParams) middleware.Responder {
+	return products.NewDeleteProductNoContent()
+}
+
+func DownloadFileHandler(f files.DownloadFileParams) middleware.Responder {
+	file, err := os.Open(os.Getenv("IMAGE_FILE"))
 	if err != nil {
-		log.Fatalln(err)
+		return files.NewDownloadFileInternalServerError().WithPayload(map[string]string{"error": err.Error()})
 	}
-
-	api := operations.NewEchoExampleAPI(swaggerSpec)
-
-	api.ProductsCreateProductHandler = products.CreateProductHandlerFunc(CreateProductHandler)
-	api.ProductsGetProductHandler = products.GetProductHandlerFunc(GetProductHandler)
-	api.ProductsListProductsHandler = products.ListProductsHandlerFunc(ListProductsHandler)
-
-	server := restapi.NewServer(api)
-
-	server.ConfigureAPI()
-	return server, server.Shutdown
+	return files.NewDownloadFileOK().WithPayload(file).WithContentType("image/png").WithContentDisposition("inline; filename=image.png")
 }

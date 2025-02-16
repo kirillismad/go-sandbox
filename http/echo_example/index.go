@@ -186,14 +186,17 @@ func updateHandler(c echo.Context) error {
 // @Description Send a file
 // @Tags files
 // @Produce  application/octet-stream
-// @Success 200
+// @Success 200 {file} file
+// @Failure 500 {object} map[string]string
+// @Header 200 {string} Content-Disposition
+// @Header 200 {string} Content-Type
 // @Router /file [get]
 func sendFile(c echo.Context) error {
-	return c.File(os.Getenv("ECHO_EXAMPLE_FILE_PATH"))
+	return c.File(os.Getenv("IMAGE_FILE"))
 }
 
 func sendAttachment(c echo.Context) error {
-	return c.Attachment(os.Getenv("ECHO_EXAMPLE_FILE_PATH"), "image.png")
+	return c.Attachment(os.Getenv("IMAGE_FILE"), "image.png")
 }
 
 func sendStream(c echo.Context) error {
@@ -229,7 +232,7 @@ func sendStream(c echo.Context) error {
 	return c.Stream(http.StatusOK, echo.MIMEApplicationJSON, reader)
 }
 
-// @title Echo Example API
+// @title APIExample
 // @version 1.0
 func BuildServer() *echo.Echo {
 	logger, err := zap.NewProduction()

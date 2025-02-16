@@ -16,7 +16,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	"sandbox/http/swagger_generated/models"
+	"sandbox/http/swagger_gen/models"
 )
 
 // NewUpdateProductParams creates a new UpdateProductParams object

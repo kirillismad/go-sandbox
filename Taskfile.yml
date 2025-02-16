@@ -6,6 +6,11 @@ tasks:
       - go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
       - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
+  swagger-plugins:
+    cmds:
+      - go install github.com/go-swagger/go-swagger/cmd/swagger@latest
+      - go install github.com/swaggo/swag/cmd/swag@latest
+
   download:
     cmds:
       - go mod download
@@ -17,19 +22,19 @@ tasks:
   init:
     deps:
       - grpc-plugins
+      - swagger-plugins
       - add-repo
       - download
 
-  generate:
+  swgen:
     cmds:
       - |
-        swagger generate server -f http/swagger_generated/api/swagger.yaml \
-                                -A echo_example \
-                                --target http/swagger_generated
+        swagger generate server -f http/swagger_gen/api/swagger.yaml \
+                                --target http/swagger_gen
   swag:
     cmds:
       - swag init -g http/echo_example/index.go -o http/echo_example/docs
 
   build:
     cmds:
-      - go build -o bin/server http/swagger_generated/cmd/echo-example-server/main.go
+      - go build -o bin/server http/swagger_gen/cmd/api-example-server/main.go

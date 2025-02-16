@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
 
-	"sandbox/http/swagger_generated/models"
+	"sandbox/http/swagger_gen/models"
 )
 
 // NewCreateProductParams creates a new CreateProductParams object

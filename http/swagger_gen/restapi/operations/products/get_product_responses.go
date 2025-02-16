@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"sandbox/http/swagger_generated/models"
+	"sandbox/http/swagger_gen/models"
 )
 
 // GetProductOKCode is the HTTP code returned for type GetProductOK

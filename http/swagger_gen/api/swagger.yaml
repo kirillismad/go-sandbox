@@ -18,7 +18,7 @@ definitions:
     type: object
 info:
   contact: {}
-  title: Echo Example API
+  title: APIExample
   version: "1.0"
 paths:
   /file:
@@ -30,6 +30,19 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            Content-Disposition:
+              type: string
+            Content-Type:
+              type: string
+          schema:
+            type: file
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
       summary: Send a file
       tags:
       - files

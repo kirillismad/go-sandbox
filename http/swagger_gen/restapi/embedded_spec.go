@@ -20,7 +20,7 @@ func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
   "swagger": "2.0",
   "info": {
-    "title": "Echo Example API",
+    "title": "APIExample",
     "contact": {},
     "version": "1.0"
   },
@@ -38,7 +38,27 @@ func init() {
         "operationId": "DownloadFile",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+              "type": "file"
+            },
+            "headers": {
+              "Content-Disposition": {
+                "type": "string"
+              },
+              "Content-Type": {
+                "type": "string"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
           }
         }
       }
@@ -273,7 +293,7 @@ func init() {
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
   "swagger": "2.0",
   "info": {
-    "title": "Echo Example API",
+    "title": "APIExample",
     "contact": {},
     "version": "1.0"
   },
@@ -291,7 +311,27 @@ func init() {
         "operationId": "DownloadFile",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+              "type": "file"
+            },
+            "headers": {
+              "Content-Disposition": {
+                "type": "string"
+              },
+              "Content-Type": {
+                "type": "string"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
           }
         }
       }
