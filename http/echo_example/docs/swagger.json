@@ -16,6 +16,7 @@
                     "files"
                 ],
                 "summary": "Send a file",
+                "operationId": "DownloadFile",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -36,6 +37,7 @@
                     "products"
                 ],
                 "summary": "List products",
+                "operationId": "ListProducts",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -60,6 +62,7 @@
                     "products"
                 ],
                 "summary": "Create a new product",
+                "operationId": "CreateProduct",
                 "parameters": [
                     {
                         "description": "Product",
@@ -103,6 +106,7 @@
                     "products"
                 ],
                 "summary": "Get a product by ID",
+                "operationId": "GetProduct",
                 "parameters": [
                     {
                         "type": "integer",
@@ -142,6 +146,7 @@
                     "products"
                 ],
                 "summary": "Update a product by ID",
+                "operationId": "UpdateProduct",
                 "parameters": [
                     {
                         "type": "integer",
@@ -190,6 +195,7 @@
                     "products"
                 ],
                 "summary": "Delete a product by ID",
+                "operationId": "DeleteProduct",
                 "parameters": [
                     {
                         "type": "integer",

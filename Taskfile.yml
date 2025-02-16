@@ -19,3 +19,17 @@ tasks:
       - grpc-plugins
       - add-repo
       - download
+
+  generate:
+    cmds:
+      - |
+        swagger generate server -f http/swagger_generated/api/swagger.yaml \
+                                -A echo_example \
+                                --target http/swagger_generated
+  swag:
+    cmds:
+      - swag init -g http/echo_example/index.go -o http/echo_example/docs
+
+  build:
+    cmds:
+      - go build -o bin/server http/swagger_generated/cmd/echo-example-server/main.go

@@ -25,6 +25,7 @@ const docTemplate = `{
                     "files"
                 ],
                 "summary": "Send a file",
+                "operationId": "DownloadFile",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -45,6 +46,7 @@ const docTemplate = `{
                     "products"
                 ],
                 "summary": "List products",
+                "operationId": "ListProducts",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -69,6 +71,7 @@ const docTemplate = `{
                     "products"
                 ],
                 "summary": "Create a new product",
+                "operationId": "CreateProduct",
                 "parameters": [
                     {
                         "description": "Product",
@@ -112,6 +115,7 @@ const docTemplate = `{
                     "products"
                 ],
                 "summary": "Get a product by ID",
+                "operationId": "GetProduct",
                 "parameters": [
                     {
                         "type": "integer",
@@ -151,6 +155,7 @@ const docTemplate = `{
                     "products"
                 ],
                 "summary": "Update a product by ID",
+                "operationId": "UpdateProduct",
                 "parameters": [
                     {
                         "type": "integer",
@@ -199,6 +204,7 @@ const docTemplate = `{
                     "products"
                 ],
                 "summary": "Delete a product by ID",
+                "operationId": "DeleteProduct",
                 "parameters": [
                     {
                         "type": "integer",
