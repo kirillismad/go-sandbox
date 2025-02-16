@@ -14,7 +14,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
+
+	_ "sandbox/http/echo_example/docs"
+
+	sw "github.com/swaggo/echo-swagger"
 )
+
+// swag init -g http/echo_example/index.go -o http/echo_example/docs
 
 type Product struct {
 	ID       int64                    `json:"id"`
@@ -22,7 +28,7 @@ type Product struct {
 	Interest float64                  `json:"interest"`
 	Title    string                   `json:"title"`
 	IsActive bool                     `json:"is_active"`
-	Content  []map[string]interface{} `json:"content"`
+	Content  []map[string]interface{} `json:"content" swaggertype:"array,object"`
 }
 
 func fatalIfErr(err error) {
@@ -35,6 +41,16 @@ func getLogger(c echo.Context) *zap.Logger {
 	return c.Get("logger").(*zap.Logger)
 }
 
+// getHandler godoc
+// @Summary Get a product by ID
+// @Description Get a product by ID
+// @Tags products
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Product ID"
+// @Success 200 {object} Product
+// @Failure 400 {object} map[string]string
+// @Router /products/{id} [get]
 func getHandler(c echo.Context) error {
 	logger := getLogger(c)
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -58,6 +74,14 @@ func getHandler(c echo.Context) error {
 	return json.NewEncoder(c.Response()).Encode(&product)
 }
 
+// listHandler godoc
+// @Summary List products
+// @Description Get a list of products
+// @Tags products
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} Product
+// @Router /products [get]
 func listHandler(c echo.Context) error {
 	products := lo.Times(5, func(i int) interface{} {
 		return Product{
@@ -77,6 +101,16 @@ func listHandler(c echo.Context) error {
 	return json.NewEncoder(c.Response()).Encode(&products)
 }
 
+// createHandler godoc
+// @Summary Create a new product
+// @Description Create a new product
+// @Tags products
+// @Accept  json
+// @Produce  json
+// @Param product body Product true "Product"
+// @Success 201 {object} Product
+// @Failure 400 {object} map[string]string
+// @Router /products [post]
 func createHandler(c echo.Context) error {
 	logger := getLogger(c)
 
@@ -92,6 +126,16 @@ func createHandler(c echo.Context) error {
 	return json.NewEncoder(c.Response()).Encode(&product)
 }
 
+// deleteHandler godoc
+// @Summary Delete a product by ID
+// @Description Delete a product by ID
+// @Tags products
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Product ID"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Router /products/{id} [delete]
 func deleteHandler(c echo.Context) error {
 	logger := getLogger(c)
 	_, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -102,6 +146,17 @@ func deleteHandler(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// updateHandler godoc
+// @Summary Update a product by ID
+// @Description Update a product by ID
+// @Tags products
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Product ID"
+// @Param product body Product true "Product"
+// @Success 200 {object} Product
+// @Failure 400 {object} map[string]string
+// @Router /products/{id} [put]
 func updateHandler(c echo.Context) error {
 	logger := getLogger(c)
 
@@ -122,6 +177,13 @@ func updateHandler(c echo.Context) error {
 	return json.NewEncoder(c.Response()).Encode(&product)
 }
 
+// sendFile godoc
+// @Summary Send a file
+// @Description Send a file
+// @Tags files
+// @Produce  application/octet-stream
+// @Success 200
+// @Router /file [get]
 func sendFile(c echo.Context) error {
 	return c.File(os.Getenv("ECHO_EXAMPLE_FILE_PATH"))
 }
@@ -163,6 +225,8 @@ func sendStream(c echo.Context) error {
 	return c.Stream(http.StatusOK, echo.MIMEApplicationJSON, reader)
 }
 
+// @title Echo Example API
+// @version 1.0
 func BuildServer() *echo.Echo {
 	logger, err := zap.NewProduction()
 	fatalIfErr(err)
@@ -204,6 +268,6 @@ func BuildServer() *echo.Echo {
 	e.GET("/file", sendFile)
 	e.GET("/attachment", sendAttachment)
 	e.GET("/stream", sendStream)
-
+	e.GET("/swagger/*", sw.WrapHandler)
 	return e
 }

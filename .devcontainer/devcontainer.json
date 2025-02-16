@@ -23,7 +23,8 @@
 				"redhat.vscode-yaml",
 				"zxh404.vscode-proto3",
 				"mtxr.sqltools",
-				"mtxr.sqltools-driver-pg"
+				"mtxr.sqltools-driver-pg",
+				"42Crunch.vscode-openapi"
 			]
 		}
 	},
