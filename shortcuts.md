@@ -12,22 +12,22 @@
 - enter = start new line
 
 - a = select all
-- b
+- b = toggle explorer
 - c = copy
 - d = duplicate line
 - e = reveal Active File in Explorer View
 - f = find
-- g 
+- g
 - h = Show Definition Preview Hover
 - i = organize imports
-- j 
+- j
 - k = go to symbol in workspace
 - l = format code
 - m
 - n = new file
 - o = go to file in workspace
 - p = parameter info
-- q 
+- q
 - r = replace
 - s = save
 - t
@@ -43,6 +43,7 @@
 ## ALT
 
 - 1 = focus explorer
+- 2 = focus outline
 - 3 = focus terminal
 
 - up = move line up
@@ -55,4 +56,3 @@
 ## ALT-SHIFT
 
 ## CTRL-ALT
-

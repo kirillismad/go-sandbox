@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"sandbox/utils"
 	"strconv"
 	"testing"
@@ -152,6 +153,55 @@ func (s *KafkaTestSuite) TestConsumer() {
 
 	err = reader.CommitMessages(ctx, m)
 	s.Require().NoError(err)
+}
+
+func (s *KafkaTestSuite) TestConsumerLoop() {
+	reader := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:     []string{"kafka:9092"},
+		GroupID:     "segmentio-group",
+		Topic:       topic,
+		StartOffset: kafka.FirstOffset,
+	})
+	go func() {
+		<-time.After(15 * time.Second)
+		reader.Close()
+	}()
+
+	for {
+		start := time.Now()
+		m, err := func() (kafka.Message, error) {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			m, err := reader.FetchMessage(ctx)
+			if err != nil {
+				return kafka.Message{}, err
+			}
+			return m, nil
+		}()
+
+		if err != nil {
+			switch {
+			case errors.Is(err, context.DeadlineExceeded):
+				s.T().Log("timeout")
+				continue
+			case errors.Is(err, io.EOF):
+				s.T().Log("no more messages")
+				return
+			default:
+				s.Require().NoError(err)
+			}
+		}
+
+		var msg Message
+		err = json.Unmarshal(m.Value, &msg)
+		s.Require().NoError(err)
+
+		s.T().Logf("partition: %d, offset: %d, key: %s, message: %s", m.Partition, m.Offset, string(m.Key), msg.Name)
+
+		err = reader.CommitMessages(context.Background(), m)
+		s.Require().NoError(err)
+		s.T().Logf("commit took: %v", time.Since(start).Seconds())
+	}
 }
 
 func (s *KafkaTestSuite) TestPipeline() {

@@ -5,7 +5,9 @@
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
 	"runServices": [
-		"app"
+		"app",
+		"kafka",
+		"kafdrop"
 	],
 	"features": {
 		"ghcr.io/devcontainers-extra/features/protoc:1": {},
