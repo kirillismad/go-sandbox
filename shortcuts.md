@@ -54,9 +54,9 @@
 - 5 = open edits
 - 6 = source control
 
-
 - up = move line up
 - down = move line down
+- tab = View: Quick Open Previous Recently Used Editor in Group [workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup]
 
 ## CTRL(CMD)-SHIFT
 
@@ -69,3 +69,4 @@
 - m = open inline chat
 - u = auto fix
 - ; = (View: Show All Editors By Most Recently Used) [workbench.action.showAllEditorsByMostRecentlyUsed]
+- k = generate commit message with copilot
