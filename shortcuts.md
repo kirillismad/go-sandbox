@@ -9,19 +9,19 @@
 
 - click = go to declaration
 - backspace = delete line
-- enter = start new line
+- enter = insert line below
 
 - a = select all
-- b = toggle explorer
+- b = toggle explorer (View: Toggle Primary Side Bar Visibility) [workbench.action.toggleSidebarVisibility]
 - c = copy
-- d = duplicate line
-- e = reveal Active File in Explorer View
+- d = duplicate line (Copy Line Down) [editor.action.copyLinesDownAction]
+- e = reveal explorer (File: Reveal Active File in Explorer View) [workbench.files.action.showActiveFileInExplorer]
 - f = find
-- g 
+- g = go to symbol in workspace
 - h = Show Definition Preview Hover
 - i = organize imports
 - j = peek definition
-- k = go to symbol in workspace
+- k = **functional key**
 - l = format code
 - m = open quick chat
 - n = new file
@@ -37,6 +37,7 @@
 - x = cut
 - y = peek references
 - z = undo
+- ; = (View: Show Editors in Active Group By Most Recently Used) [workbench.action.showEditorsInActiveGroup]
 
 - / = comment with line comment
 - [ = go back
@@ -44,11 +45,14 @@
 
 ## ALT(Option)
 
+- space = trigger suggestion
+
 - 1 = focus explorer
 - 2 = focus outline
 - 3 = focus terminal
 - 4 = open chat view
 - 5 = open edits
+- 6 = source control
 
 
 - up = move line up
@@ -56,8 +60,12 @@
 
 ## CTRL(CMD)-SHIFT
 
+- enter = insert line above
+
 - j = peek type definition
 - n = new folder
 - t = find all implementations
 - y = find all references
 - m = open inline chat
+- u = auto fix
+- ; = (View: Show All Editors By Most Recently Used) [workbench.action.showAllEditorsByMostRecentlyUsed]
