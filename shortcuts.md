@@ -1,5 +1,19 @@
 # Goland Shortcuts VScode (WINDOWS)
 
+- [x] find all references
+- [x] find all implementations
+
+- [x] peek references
+- [x] peek implementations
+- [x] peek type definition
+- [x] peek definition 
+
+- [x] open chat view
+- [x] open edits
+- [x] open quick chat
+- [x] open inline chat
+
+
 ## Common
 
 - F1 = find action
@@ -17,42 +31,47 @@
 - d = duplicate line
 - e = reveal Active File in Explorer View
 - f = find
-- g
+- g 
 - h = Show Definition Preview Hover
 - i = organize imports
-- j
+- j = peek definition
 - k = go to symbol in workspace
 - l = format code
-- m
+- m = open quick chat
 - n = new file
 - o = go to file in workspace
 - p = parameter info
-- q
+- q = reload window
 - r = replace
 - s = save
-- t
+- t = peek implementations
 - u = quick fix
 - v = paste
 - w = close tab
 - x = cut
-- y
+- y = peek references
 - z = undo
 
 - / = comment with line comment
+- [ = go back
+- ] = go forward
 
-## ALT
+## ALT(Option)
 
 - 1 = focus explorer
 - 2 = focus outline
 - 3 = focus terminal
+- 4 = open chat view
+- 5 = open edits
+
 
 - up = move line up
 - down = move line down
 
-## CTRL-SHIFT
+## CTRL(CMD)-SHIFT
 
+- j = peek type definition
 - n = new folder
-
-## ALT-SHIFT
-
-## CTRL-ALT
+- t = find all implementations
+- y = find all references
+- m = open inline chat

@@ -9,10 +9,6 @@ import (
 	"time"
 )
 
-// TODO
-// 1. Add tests
-// 2. Add `cap` option instead creating a bucket with `.Limit` capacity
-
 type request struct {
 	done chan struct{}
 }
@@ -33,6 +29,10 @@ var defaultCapLimit = CapLimit{
 	Cap:   64,
 }
 
+// LeakyBucketRateLimiter implements a rate limiter using the leaky bucket algorithm.
+// It maintains a state map to track the rate limit information for different keys.
+// The structure uses a mutex for synchronization and atomic values for limits, default limit, and TTL.
+// The cleanupInterval specifies the duration for periodic cleanup of expired entries.
 type LeakyBucketRateLimiter struct {
 	state           map[string]lbItem
 	mu              sync.Mutex
@@ -42,6 +42,17 @@ type LeakyBucketRateLimiter struct {
 	cleanupInterval time.Duration
 }
 
+// NewLeakyBucketRateLimiter creates a new instance of LeakyBucketRateLimiter with the provided context, limits, and options.
+// It initializes the rate limiter with default values for TTL, default limit, and cleanup interval, which can be overridden
+// by the provided options. The cleanup process is started in a separate goroutine.
+//
+// Parameters:
+//   - ctx: The context to control the lifecycle of the rate limiter.
+//   - limits: A map of string keys to CapLimit values defining the rate limits for different keys.
+//   - opts: A variadic list of Option functions to customize the rate limiter.
+//
+// Returns:
+//   - A pointer to the newly created LeakyBucketRateLimiter.
 func NewLeakyBucketRateLimiter(ctx context.Context, limits map[string]CapLimit, opts ...Option[*LeakyBucketRateLimiter]) *LeakyBucketRateLimiter {
 	l := &LeakyBucketRateLimiter{
 		state:           make(map[string]lbItem),
