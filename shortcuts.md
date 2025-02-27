@@ -1,18 +1,4 @@
-# Goland Shortcuts VScode (WINDOWS)
-
-- [x] find all references
-- [x] find all implementations
-
-- [x] peek references
-- [x] peek implementations
-- [x] peek type definition
-- [x] peek definition 
-
-- [x] open chat view
-- [x] open edits
-- [x] open quick chat
-- [x] open inline chat
-
+# Goland Shortcuts VScode
 
 ## Common
 
