@@ -10,8 +10,11 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: 6379
 
+      NATS_HOST: ${NATS_HOST}
+      NATS_PORT: 4222
+
     volumes:
-      - ../..:/workspaces:cached
+      - ..:/app:cached
     command: sleep infinity
   
   mongo:
@@ -23,6 +26,19 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
       - ${MONGO_LOCAL_PORT}:27017
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+        limits:
+          cpus: '0.2'
+          memory: 256M
 
   mongo_express:
     hostname: ${MONGO_EXPRESS_HOST}
@@ -37,6 +53,19 @@ services:
       ME_CONFIG_MONGODB_PORT: ${MONGO_PORT}
     ports:
       - ${MONGO_EXPRESS_LOCAL_PORT}:8081
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+        limits:
+          cpus: '0.2'
+          memory: 256M
   
   redis:
     hostname: ${REDIS_HOST}
@@ -44,6 +73,19 @@ services:
     restart: unless-stopped
     ports:
       - ${REDIS_LOCAL_PORT}:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+        limits:
+          cpus: '0.2'
+          memory: 256M
 
   postgres:
     hostname: ${POSTGRES_HOST}
@@ -55,6 +97,19 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - ${POSTGRES_LOCAL_PORT}:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username ${POSTGRES_USER} --dbname ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.2'
+          memory: 256M
+        limits:
+          cpus: '0.4'
+          memory: 512M
 
   kafka:
     image: apache/kafka:3.9.0
@@ -78,6 +133,14 @@ services:
       interval: 10s
       retries: 5
       start_period: 10s
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.2'
+          memory: 256M
+        limits:
+          cpus: '0.4'
+          memory: 512M
 
   kafdrop:
     image: obsidiandynamics/kafdrop:4.1.0
@@ -86,5 +149,38 @@ services:
     environment:
       KAFKA_BROKERCONNECT: "${KAFKA_HOST}:9092"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.4'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
+
+  nats:
+    image: nats:2.10
+    hostname: ${NATS_HOST}
+    ports:
+      - ${NATS_LOCAL_PORT}:4222
+    healthcheck:
+      test: ["CMD", "nats", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+        limits:
+          cpus: '0.2'
+          memory: 256M
+
 
 

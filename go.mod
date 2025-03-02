@@ -22,6 +22,7 @@ require (
 
 require (
 	github.com/confluentinc/confluent-kafka-go/v2 v2.8.0
+	github.com/nats-io/nats.go v1.39.1
 	github.com/segmentio/kafka-go v0.4.47
 	github.com/swaggo/swag v1.16.4
 	go.uber.org/zap v1.27.0
@@ -39,6 +40,8 @@ require (
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/nats-io/nkeys v0.4.9 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

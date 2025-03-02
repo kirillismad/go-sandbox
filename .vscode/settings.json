@@ -1,5 +1,5 @@
 {
-    "go.buildTags": "redis,mongodb,postgres,kafka",
+    "go.buildTags": "redis,mongodb,postgres,kafka,nats",
     "go.testFlags": [
         "-v"
     ],
