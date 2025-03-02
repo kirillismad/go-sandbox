@@ -20,8 +20,6 @@ import (
 	sw "github.com/swaggo/echo-swagger"
 )
 
-// swag init -g http/echo_example/index.go -o http/echo_example/docs
-
 type Product struct {
 	ID       int64                    `json:"id"`
 	Total    int64                    `json:"total"`
@@ -42,6 +40,7 @@ func getLogger(c echo.Context) *zap.Logger {
 }
 
 // getHandler godoc
+// @ID GetProduct
 // @Summary Get a product by ID
 // @Description Get a product by ID
 // @Tags products
@@ -75,6 +74,7 @@ func getHandler(c echo.Context) error {
 }
 
 // listHandler godoc
+// @ID ListProducts
 // @Summary List products
 // @Description Get a list of products
 // @Tags products
@@ -102,6 +102,7 @@ func listHandler(c echo.Context) error {
 }
 
 // createHandler godoc
+// @ID CreateProduct
 // @Summary Create a new product
 // @Description Create a new product
 // @Tags products
@@ -127,6 +128,7 @@ func createHandler(c echo.Context) error {
 }
 
 // deleteHandler godoc
+// @ID DeleteProduct
 // @Summary Delete a product by ID
 // @Description Delete a product by ID
 // @Tags products
@@ -147,6 +149,7 @@ func deleteHandler(c echo.Context) error {
 }
 
 // updateHandler godoc
+// @ID UpdateProduct
 // @Summary Update a product by ID
 // @Description Update a product by ID
 // @Tags products
@@ -178,18 +181,22 @@ func updateHandler(c echo.Context) error {
 }
 
 // sendFile godoc
+// @ID DownloadFile
 // @Summary Send a file
 // @Description Send a file
 // @Tags files
 // @Produce  application/octet-stream
-// @Success 200
+// @Success 200 {file} file
+// @Failure 500 {object} map[string]string
+// @Header 200 {string} Content-Disposition
+// @Header 200 {string} Content-Type
 // @Router /file [get]
 func sendFile(c echo.Context) error {
-	return c.File(os.Getenv("ECHO_EXAMPLE_FILE_PATH"))
+	return c.File(os.Getenv("IMAGE_FILE"))
 }
 
 func sendAttachment(c echo.Context) error {
-	return c.Attachment(os.Getenv("ECHO_EXAMPLE_FILE_PATH"), "image.png")
+	return c.Attachment(os.Getenv("IMAGE_FILE"), "image.png")
 }
 
 func sendStream(c echo.Context) error {
@@ -225,7 +232,7 @@ func sendStream(c echo.Context) error {
 	return c.Stream(http.StatusOK, echo.MIMEApplicationJSON, reader)
 }
 
-// @title Echo Example API
+// @title APIExample
 // @version 1.0
 func BuildServer() *echo.Echo {
 	logger, err := zap.NewProduction()

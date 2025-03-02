@@ -5,12 +5,30 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch main.go",
+            "name": "swgen",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/main.go"
+            "program": "${workspaceFolder}/http/swagger_gen/cmd/api-example-server/main.go",
+            "args": [
+                "--port",
+                "8080"
+            ],
+            "env": {
+                "IMAGE_FILE": "${workspaceFolder}/src/websocket.png"
+            }
+        },
+        {
+            "name": "main.go",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/main.go",
+            "env": {
+                "IMAGE_FILE": "${workspaceFolder}/src/websocket.png"
+            }
         },
     ]
 }

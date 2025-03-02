@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Echo Example API",
+        "title": "APIExample",
         "contact": {},
         "version": "1.0"
     },
@@ -16,9 +16,30 @@
                     "files"
                 ],
                 "summary": "Send a file",
+                "operationId": "DownloadFile",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        },
+                        "headers": {
+                            "Content-Disposition": {
+                                "type": "string"
+                            },
+                            "Content-Type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -36,6 +57,7 @@
                     "products"
                 ],
                 "summary": "List products",
+                "operationId": "ListProducts",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -60,6 +82,7 @@
                     "products"
                 ],
                 "summary": "Create a new product",
+                "operationId": "CreateProduct",
                 "parameters": [
                     {
                         "description": "Product",
@@ -103,6 +126,7 @@
                     "products"
                 ],
                 "summary": "Get a product by ID",
+                "operationId": "GetProduct",
                 "parameters": [
                     {
                         "type": "integer",
@@ -142,6 +166,7 @@
                     "products"
                 ],
                 "summary": "Update a product by ID",
+                "operationId": "UpdateProduct",
                 "parameters": [
                     {
                         "type": "integer",
@@ -190,6 +215,7 @@
                     "products"
                 ],
                 "summary": "Delete a product by ID",
+                "operationId": "DeleteProduct",
                 "parameters": [
                     {
                         "type": "integer",
