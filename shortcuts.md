@@ -26,7 +26,7 @@
 - m = open quick chat
 - n = new file
 - o = go to file in workspace
-- p = parameter info
+- p = parameter info [editor.action.triggerParameterHints]
 - q = reload window
 - r = replace
 - s = save
