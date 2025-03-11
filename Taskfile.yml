@@ -20,6 +20,7 @@ tasks:
   download:
     cmds:
       - go mod download
+      - go mod tidy
 
   add-repo:
     cmds:
