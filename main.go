@@ -1,12 +1,23 @@
 package main
 
 import (
-	"os"
-	"sandbox/http/echo_example"
+	"fmt"
+	"log"
+	"sandbox/petproj"
+
+	"github.com/spf13/cobra"
 )
 
 func main() {
-	os.Setenv("ECHO_EXAMPLE_FILE_PATH", "./src/websocket.png")
-	e := echo_example.BuildServer()
-	e.Logger.Fatal(e.Start(":8080"))
+	var rootCmd = &cobra.Command{
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Hello, World!")
+		},
+	}
+
+	rootCmd.AddCommand(petproj.RunServer)
+
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatalf("Error: %v", err)
+	}
 }

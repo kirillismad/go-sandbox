@@ -14,5 +14,7 @@
             "username": "usr",
             "password": "pwd"
         }
-    ]
+    ],
+    // used by protobuf plugin
+    "clang-format.style": "{ IndentWidth: 4, BasedOnStyle: google, AlignConsecutiveAssignments: true }",
 }

@@ -1,10 +1,16 @@
 version: "3"
 
 tasks:
+  clang-format:
+    cmds:
+      - sudo apt update -y
+      - sudo apt install -y clang-format
   grpc-plugins:
     cmds:
       - go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
       - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+      - go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+      - go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 
   swagger-plugins:
     cmds:
@@ -25,6 +31,7 @@ tasks:
       - swagger-plugins
       - add-repo
       - download
+      - clang-format
 
   swgen:
     cmds:
