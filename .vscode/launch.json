@@ -30,5 +30,19 @@
                 "IMAGE_FILE": "${workspaceFolder}/src/websocket.png"
             }
         },
+        {
+            "name": "petproj",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/main.go",
+            "env": {
+                "IMAGE_FILE": "${workspaceFolder}/src/websocket.png"
+            },
+            "args": [
+                "petproj",
+            ]
+        },
     ]
 }
