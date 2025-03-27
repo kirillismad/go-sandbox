@@ -62,6 +62,7 @@
 
 - enter = insert line above
 
+- i = add import
 - j = peek type definition
 - n = new folder
 - t = find all implementations
