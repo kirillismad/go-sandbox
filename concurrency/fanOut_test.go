@@ -2,6 +2,7 @@ package concurrency
 
 import (
 	"context"
+	"sandbox/utils"
 	"slices"
 	"sync"
 	"testing"
@@ -103,5 +104,39 @@ func TestFanOutBroadcast(t *testing.T) {
 
 	for i, r := range result {
 		require.ElementsMatch(t, want, r, "result[%v] is not equal to want", i)
+	}
+}
+
+func TestFanOutSimple(t *testing.T) {
+	want := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	in := make(chan int)
+
+	go func() {
+		defer close(in)
+		for _, v := range want {
+			in <- v
+		}
+	}()
+
+	const outCnt = 3
+	outs := FanOutSimple(in, outCnt)
+
+	result := make([]int, 0, len(want))
+
+	for el := range FanInSimple(utils.Map(outs, func(out chan int) <-chan int { return out })...) {
+		result = append(result, el)
+	}
+	require.ElementsMatch(t, want, result, "result is not equal to want")
+}
+
+func TestFanOutSimpleCancel(t *testing.T) {
+	in := make(chan int)
+	outs := FanOutSimple(in, 2)
+
+	close(in)
+
+	for i, out := range outs {
+		_, ok := <-out
+		require.False(t, ok, "channel[%v] is not closed", i)
 	}
 }

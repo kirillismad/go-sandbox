@@ -48,10 +48,11 @@ func FanInSimple[T any](ins ...<-chan T) <-chan T {
 		defer close(out)
 
 		var wg sync.WaitGroup
-		wg.Add(len(ins))
 
 		for _, ch := range ins {
 			ch := ch
+
+			wg.Add(1)
 			go func() {
 				defer wg.Done()
 				for e := range ch {

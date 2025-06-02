@@ -86,5 +86,16 @@ services:
     environment:
       KAFKA_BROKERCONNECT: "${KAFKA_HOST}:9092"
     restart: unless-stopped
+  
+  rabbitmq:
+    image: rabbitmq:4-management
+    hostname: ${RABBITMQ_HOST}
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - ${RABBITMQ_LOCAL_PORT}:5672
+      - ${RABBITMQ_MANAGEMENT_LOCAL_PORT}:15672
 
 

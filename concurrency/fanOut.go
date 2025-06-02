@@ -68,3 +68,21 @@ func FanOutBroadcast[T any](ctx context.Context, in <-chan T, outCnt int) []chan
 
 	return outs
 }
+
+func FanOutSimple[T any](in <-chan T, outCnt int) []chan T {
+	outs := make([]chan T, 0, outCnt)
+	for range outCnt {
+		outs = append(outs, make(chan T))
+	}
+
+	for _, ch := range outs {
+		go func() {
+			defer close(ch)
+			for e := range in {
+				ch <- e
+			}
+		}()
+	}
+
+	return outs
+}

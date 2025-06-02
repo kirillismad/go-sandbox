@@ -6,8 +6,7 @@
 	"service": "app",
 	"runServices": [
 		"app",
-		"kafka",
-		"kafdrop"
+		"rabbitmq"
 	],
 	"features": {
 		"ghcr.io/devcontainers-extra/features/protoc:1": {},

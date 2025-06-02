@@ -17,7 +17,7 @@ func init() {
 
 type Handler interface {
 	GetRepo() Repo
-	InTrasaction(funcTx func(repo Repo) error) error
+	InTx(funcTx func(repo Repo) error) error
 }
 
 type Repo interface {
@@ -41,7 +41,7 @@ func (h *repoHandler) GetRepo() Repo {
 	return newRepo(h.db)
 }
 
-func (h *repoHandler) InTrasaction(funcTx func(r Repo) error) error {
+func (h *repoHandler) InTx(funcTx func(r Repo) error) error {
 	tx, err := h.db.Beginx()
 
 	if err != nil {
@@ -49,7 +49,7 @@ func (h *repoHandler) InTrasaction(funcTx func(r Repo) error) error {
 	}
 	defer tx.Rollback()
 
-	if err := funcTx(newRepo(h.db)); err != nil {
+	if err := funcTx(newRepo(tx)); err != nil {
 		return fmt.Errorf("funcTx: %w", err)
 	}
 

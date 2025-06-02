@@ -4,8 +4,13 @@
 
 - F1 = find action
 - F2 = rename
+- F3 = peek implementations
+- F4 = peek references
 
 ## CTRL/CMD
+
+- F3 = find all implementations
+- F4 = find all references
 
 - click = go to declaration
 - backspace = delete line
@@ -30,12 +35,12 @@
 - q = reload window
 - r = replace
 - s = save
-- t = peek implementations
+- t = new window
 - u = quick fix
 - v = paste
 - w = close tab
 - x = cut
-- y = peek references
+- y =
 - z = undo
 - ; = (View: Show Editors in Active Group By Most Recently Used) [workbench.action.showEditorsInActiveGroup]
 
@@ -48,7 +53,7 @@
 - space = trigger suggestion
 
 - 1 = focus explorer
-- 2 = focus outline
+- 2 = focus outline (+shift = focus package outline)
 - 3 = focus terminal
 - 4 = open chat view
 - 5 = open edits
@@ -64,8 +69,6 @@
 
 - j = peek type definition
 - n = new folder
-- t = find all implementations
-- y = find all references
 - m = open inline chat
 - u = auto fix
 - ; = (View: Show All Editors By Most Recently Used) [workbench.action.showAllEditorsByMostRecentlyUsed]

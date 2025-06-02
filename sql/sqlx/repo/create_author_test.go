@@ -69,7 +69,7 @@ func TestCreateAuthors(t *testing.T) {
 
 		//act
 		var result entities.Author
-		err := repoHandler.InTrasaction(func(repo Repo) error {
+		err := repoHandler.InTx(func(repo Repo) error {
 			var errTx error
 			result, errTx = repo.CreateAuthor(getctx(), entity)
 			return errTx
