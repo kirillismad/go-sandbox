@@ -1,0 +1,40 @@
+# CODEOWNERS
+# This file defines code ownership for automated review requests
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - these users will be requested as reviewers for all PRs
+* @kirillismad
+
+# Go source code
+*.go @kirillismad
+
+# Configuration files
+*.yml @kirillismad
+*.yaml @kirillismad
+*.json @kirillismad
+
+# Documentation
+*.md @kirillismad
+/docs/ @kirillismad
+
+# Database related
+/sql/ @kirillismad
+
+# HTTP API and web services
+/http/ @kirillismad
+/grpc/ @kirillismad
+
+# Infrastructure and deployment
+/.github/ @kirillismad
+/.devcontainer/ @kirillismad
+Dockerfile* @kirillismad
+docker-compose* @kirillismad
+
+# Build and task configuration
+Taskfile.yml @kirillismad
+Makefile @kirillismad
+go.mod @kirillismad
+go.sum @kirillismad
+
+# Security sensitive files
+/.github/workflows/ @kirillismad

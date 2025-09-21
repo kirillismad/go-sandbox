@@ -1,0 +1,131 @@
+# Repository Configuration
+# This file documents the recommended repository settings for managing access to the master branch
+# Note: These settings must be applied through GitHub's web interface or API
+
+repository:
+  # Basic repository settings
+  name: go-sandbox
+  description: "A comprehensive Go development sandbox with examples, algorithms, and various integrations"
+  homepage: ""
+  private: false
+  
+  # Security and analysis
+  security_and_analysis:
+    secret_scanning:
+      status: enabled
+    secret_scanning_push_protection:
+      status: enabled
+    dependency_graph:
+      status: enabled
+    dependabot_security_updates:
+      status: enabled
+
+  # General settings
+  settings:
+    # Features
+    wiki_enabled: true
+    issues_enabled: true
+    projects_enabled: true
+    discussions_enabled: false
+    
+    # Pull requests
+    allow_merge_commit: true
+    allow_squash_merge: true
+    allow_rebase_merge: false
+    delete_branch_on_merge: true
+    
+    # Pushes
+    allow_force_pushes: false
+    allow_deletions: false
+
+# Branch protection rules
+branch_protection:
+  master:  # or 'main' for repositories using main as default branch
+    # Require pull request reviews before merging
+    required_pull_request_reviews:
+      required_approving_review_count: 1
+      dismiss_stale_reviews: true
+      require_code_owner_reviews: true
+      require_last_push_approval: false
+      
+    # Require status checks to pass before merging
+    required_status_checks:
+      strict: true  # Require branches to be up to date before merging
+      contexts:
+        - "test"           # Must match GitHub Actions job names
+        - "lint"
+        - "build"
+        - "security"
+        - "validate-dependencies"
+        
+    # Additional protections
+    enforce_admins: true  # Include administrators in these restrictions
+    require_linear_history: false
+    allow_force_pushes: false
+    allow_deletions: false
+    require_conversation_resolution: true
+    
+    # Restrict pushes (optional - for fine-grained access control)
+    restrictions:
+      users: []     # Specific users who can push (empty = no restrictions by user)
+      teams: []     # Specific teams who can push (empty = no restrictions by team)
+      apps: []      # Apps that can push (e.g., dependabot)
+
+# Collaborator access levels
+# Note: These are examples and should be adjusted based on your team structure
+collaborators:
+  # Repository owner
+  kirillismad:
+    permission: admin
+    
+  # Example team permissions (adjust as needed)
+  # backend-team:
+  #   permission: write
+  # frontend-team:
+  #   permission: write
+  # qa-team:
+  #   permission: triage
+  # external-contributors:
+  #   permission: read
+
+# Code owners configuration
+# Actual configuration is in .github/CODEOWNERS file
+code_owners:
+  enabled: true
+  patterns:
+    - pattern: "*"
+      owners: ["@kirillismad"]
+    - pattern: "*.go"
+      owners: ["@kirillismad"]
+    - pattern: "/docs/"
+      owners: ["@kirillismad"]
+    - pattern: "/.github/"
+      owners: ["@kirillismad"]
+
+# Webhook configurations (if needed for external integrations)
+webhooks: []
+
+# GitHub Apps and integrations
+apps:
+  # Dependabot for automated dependency updates
+  dependabot:
+    enabled: true
+    configuration_file: ".github/dependabot.yml"
+  
+  # CodeQL for security scanning
+  codeql:
+    enabled: true
+    languages: ["go"]
+
+# Deployment settings
+environments: []
+
+# Secrets (names only - values must be set through GitHub interface)
+secrets:
+  # Add any required secrets for CI/CD
+  # - CODECOV_TOKEN (for code coverage reporting)
+  # - DOCKER_HUB_TOKEN (if using Docker)
+  # - NPM_TOKEN (if publishing npm packages)
+
+# Variables for GitHub Actions
+variables: []
