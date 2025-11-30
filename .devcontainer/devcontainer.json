@@ -10,7 +10,6 @@
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers-extra/features/protoc:1": {},
-		"ghcr.io/marcozac/devcontainer-features/buf:1": {},
 		"ghcr.io/eitsupi/devcontainer-features/go-task:1": {},
 		"ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
 			"theme": "risto",
