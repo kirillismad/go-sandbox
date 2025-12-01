@@ -5,19 +5,18 @@
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
 	"runServices": [
-		"app",
-		"rabbitmq"
+		"app"
 	],
 	"features": {
+		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers-extra/features/protoc:1": {},
-		"ghcr.io/marcozac/devcontainer-features/buf:1": {},
 		"ghcr.io/eitsupi/devcontainer-features/go-task:1": {},
 		"ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
-			"theme": "robbyrussell",
+			"theme": "risto",
 			"plugins": "git"
 		}
 	},
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/app",
 	"customizations": {
 		"vscode": {
 			"extensions": [

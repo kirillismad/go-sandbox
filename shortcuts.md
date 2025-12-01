@@ -31,7 +31,7 @@
 - m = open quick chat
 - n = new file
 - o = go to file in workspace
-- p = parameter info
+- p = parameter info [editor.action.triggerParameterHints]
 - q = reload window
 - r = replace
 - s = save
@@ -67,6 +67,7 @@
 
 - enter = insert line above
 
+- i = add import
 - j = peek type definition
 - n = new folder
 - m = open inline chat

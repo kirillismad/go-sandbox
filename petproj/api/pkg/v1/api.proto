@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package pkg.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "petproj/api/pkg/v1;api";
+
+service Service {
+    rpc ListProducts(ListProductsRequest) returns (ListProductsResponse) {
+        option (google.api.http) = {
+            get: "/products"
+        };
+    }
+    rpc GetProduct(GetProductRequest) returns (GetProductResponse) {
+        option (google.api.http) = {
+            get: "/products/{id}"
+        };
+    }
+    rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse) {
+        option (google.api.http) = {
+            post: "/products"
+            body: "*"
+        };
+    }
+    rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse) {
+        option (google.api.http) = {
+            put: "/products/{id}"
+            body: "*"
+        };
+    }
+    rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse) {
+        option (google.api.http) = {
+            delete: "/products/{id}"
+        };
+    }
+}
+
+message Money {
+    int64 units = 1;
+    int32 nanos = 2;
+}
+
+message ListProductsRequest {
+    string query = 1;
+    int32 page   = 2;
+    int32 limit  = 3;
+    Order order  = 4;
+    message Order {
+        string field = 1;
+        bool desc    = 2;
+    }
+}
+
+message ListProductsResponse {
+    repeated Product products = 1;
+
+    message Product {
+        int64 id                   = 1;
+        string title               = 2;
+        repeated string image_urls = 3;
+        float rate                 = 4;
+        bool is_favorite           = 5;
+        int64 review_count         = 6;
+        Money price                = 7;
+    }
+}
+
+message GetProductRequest {
+    int64 id = 1;
+}
+
+message GetProductResponse {
+    Product product = 1;
+
+    message Product {
+        int64 id                   = 1;
+        string title               = 2;
+        repeated string image_urls = 3;
+        float rate                 = 4;
+        bool is_favorite           = 5;
+        int64 review_count         = 6;
+        Money price                = 7;
+        Seller seller              = 8;
+
+        message Seller {
+            int64 id        = 1;
+            string name     = 2;
+            string icon_url = 3;
+        }
+    }
+}
+
+message CreateProductRequest {
+    string title               = 1;
+    repeated string image_urls = 2;
+    Money price                = 6;
+}
+
+message CreateProductResponse {
+    int64 id = 1;
+}
+
+message UpdateProductRequest {
+    int64 id                   = 1;
+    string title               = 2;
+    repeated string image_urls = 3;
+    Money price                = 4;
+}
+
+message UpdateProductResponse {
+    Product product = 1;
+
+    message Product {
+        int64 id                   = 1;
+        string title               = 2;
+        repeated string image_urls = 3;
+        float rate                 = 4;
+        bool is_favorite           = 5;
+        int64 review_count         = 6;
+        Money price                = 7;
+        Seller seller              = 8;
+
+        message Seller {
+            int64 id        = 1;
+            string name     = 2;
+            string icon_url = 3;
+        }
+    }
+}
+
+message DeleteProductRequest {
+    int64 id = 1;
+}
+
+message DeleteProductResponse {}
