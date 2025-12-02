@@ -8,17 +8,32 @@ func isValid(s string) bool {
 		'}': '{',
 	}
 	var stack []rune
+	push := func(r rune) {
+		stack = append(stack, r)
+	}
+	peek := func() rune {
+		return stack[len(stack)-1]
+	}
+
+	pop := func() rune {
+		r := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		return r
+	}
+	empty := func() bool {
+		return len(stack) == 0
+	}
 
 	for _, r := range s {
 		open, isClosing := closeOpen[r]
-		if !isClosing {
-			stack = append(stack, r)
+		if isOpening := !isClosing; isOpening {
+			push(r)
 			continue
 		}
-		if len(stack) == 0 || stack[len(stack)-1] != open {
+		if empty() || peek() != open {
 			return false
 		}
-		stack = stack[:len(stack)-1]
+		pop()
 	}
-	return len(stack) == 0
+	return empty()
 }
