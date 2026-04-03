@@ -1,22 +1,16 @@
 services:
   app:
-    image: mcr.microsoft.com/devcontainers/go:1-1.23-bookworm
+    image: mcr.microsoft.com/devcontainers/go:1.25-bookworm
     environment:
       MONGO_HOST: ${MONGO_HOST}
       MONGO_PORT: ${MONGO_PORT}
       MONGO_USER: ${MONGO_USER}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
-      
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: 6379
-
-      NATS_HOST: ${NATS_HOST}
-      NATS_PORT: 4222
 
     volumes:
       - ..:/app:cached
     command: sleep infinity
-  
+
   mongo:
     hostname: ${MONGO_HOST}
     image: mongo:8
@@ -27,17 +21,21 @@ services:
     ports:
       - ${MONGO_LOCAL_PORT}:27017
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      test:
+        [
+          "CMD-SHELL",
+          'mongosh --quiet --eval "db.adminCommand({ ping: 1 }).ok" | grep 1',
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
     deploy:
       resources:
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 128M
         limits:
-          cpus: '0.2'
+          cpus: "0.2"
           memory: 256M
 
   mongo_express:
@@ -61,15 +59,15 @@ services:
     deploy:
       resources:
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 128M
         limits:
-          cpus: '0.2'
+          cpus: "0.2"
           memory: 256M
-  
+
   redis:
     hostname: ${REDIS_HOST}
-    image: redis:7
+    image: redis:8
     restart: unless-stopped
     ports:
       - ${REDIS_LOCAL_PORT}:6379
@@ -81,15 +79,15 @@ services:
     deploy:
       resources:
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 128M
         limits:
-          cpus: '0.2'
+          cpus: "0.2"
           memory: 256M
 
   postgres:
     hostname: ${POSTGRES_HOST}
-    image: postgres:17
+    image: postgres:18
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -98,99 +96,19 @@ services:
     ports:
       - ${POSTGRES_LOCAL_PORT}:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready --username ${POSTGRES_USER} --dbname ${POSTGRES_DB}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready --username ${POSTGRES_USER} --dbname ${POSTGRES_DB}",
+        ]
       interval: 10s
       retries: 5
       start_period: 10s
     deploy:
       resources:
         reservations:
-          cpus: '0.2'
+          cpus: "0.2"
           memory: 256M
         limits:
-          cpus: '0.4'
+          cpus: "0.4"
           memory: 512M
-
-  kafka:
-    image: apache/kafka:3.9.0
-    hostname: ${KAFKA_HOST}
-    restart: unless-stopped
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_HOST}:9092
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@${KAFKA_HOST}:9093
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 5000
-      KAFKA_NUM_PARTITIONS: 2
-    healthcheck:
-      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
-      interval: 10s
-      retries: 5
-      start_period: 10s
-    deploy:
-      resources:
-        reservations:
-          cpus: '0.2'
-          memory: 256M
-        limits:
-          cpus: '0.4'
-          memory: 512M
-
-  kafdrop:
-    image: obsidiandynamics/kafdrop:4.1.0
-    ports:
-      - "9000:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "${KAFKA_HOST}:9092"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          cpus: '0.4'
-          memory: 512M
-        reservations:
-          cpus: '0.2'
-          memory: 256M
-  rabbitmq:
-    image: rabbitmq:4-management
-    hostname: ${RABBITMQ_HOST}
-    restart: unless-stopped
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-    ports:
-      - ${RABBITMQ_LOCAL_PORT}:5672
-      - ${RABBITMQ_MANAGEMENT_LOCAL_PORT}:15672
-
-  nats:
-    image: nats:2.10
-    hostname: ${NATS_HOST}
-    ports:
-      - ${NATS_LOCAL_PORT}:4222
-    healthcheck:
-      test: ["CMD", "nats", "ping"]
-      interval: 10s
-      retries: 5
-      start_period: 10s
-    deploy:
-      resources:
-        reservations:
-          cpus: '0.1'
-          memory: 128M
-        limits:
-          cpus: '0.2'
-          memory: 256M
-
-
-

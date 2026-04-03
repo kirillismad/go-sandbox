@@ -9,7 +9,6 @@
 	],
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers-extra/features/protoc:1": {},
 		"ghcr.io/eitsupi/devcontainer-features/go-task:1": {},
 		"ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
 			"theme": "risto",
@@ -21,7 +20,6 @@
 		"vscode": {
 			"extensions": [
 				"redhat.vscode-yaml",
-				"zxh404.vscode-proto3",
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-pg",
 				"42Crunch.vscode-openapi"

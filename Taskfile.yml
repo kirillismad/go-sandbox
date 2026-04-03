@@ -1,48 +1,6 @@
 version: "3"
 
 tasks:
-  clang-format:
-    cmds:
-      - sudo apt update -y
-      - sudo apt install -y clang-format
-  grpc-plugins:
-    cmds:
-      - go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-      - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-      - go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
-      - go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
-
-  swagger-plugins:
-    cmds:
-      - go install github.com/go-swagger/go-swagger/cmd/swagger@latest
-      - go install github.com/swaggo/swag/cmd/swag@latest
-
-  download:
-    cmds:
-      - go mod download
-      - go mod tidy
-
-  add-repo:
-    cmds:
-      - git config --global --add safe.directory $(pwd)
-
   init:
-    deps:
-      - grpc-plugins
-      - swagger-plugins
-      - add-repo
-      - download
-      - clang-format
-
-  swgen:
     cmds:
-      - |
-        swagger generate server -f http/swagger_gen/api/swagger.yaml \
-                                --target http/swagger_gen
-  swag:
-    cmds:
-      - swag init -g http/echo_example/index.go -o http/echo_example/docs
-
-  build:
-    cmds:
-      - go build -o bin/server http/swagger_gen/cmd/api-example-server/main.go
+      - echo "Init"
