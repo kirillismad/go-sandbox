@@ -1,0 +1,13 @@
+### Search coffee items by text and return only raw object
+POST {{baseUrl}}/{{indexName}}/_search
+Content-Type: application/json
+
+< ./query1.json
+
+
+### List first 20 coffee items
+POST {{baseUrl}}/{{indexName}}/_search
+Content-Type: application/json
+
+
+< ./query-no-filter.json

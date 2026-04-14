@@ -1,0 +1,16 @@
+{
+	"_source": {
+		"includes": [
+			"raw"
+		]
+	},
+	"size": 20,
+	"query": {
+		"match": {
+			"search_text": {
+				"query": "blend Amber",
+                "operator": "and"
+			}
+		}
+	}
+}

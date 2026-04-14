@@ -1,0 +1,19 @@
+# @name create-index
+PUT {{baseUrl}}/{{indexName}}
+Content-Type: application/json
+
+< ./coffee_mapping.json
+
+###
+
+# @name delete-index
+DELETE {{baseUrl}}/{{indexName}}
+Content-Type: application/json
+
+###
+
+# @name get-index
+GET {{baseUrl}}/{{indexName}}
+Content-Type: application/json
+
+###

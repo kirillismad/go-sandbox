@@ -15,6 +15,12 @@
             "password": "pwd"
         }
     ],
-    // used by protobuf plugin
-    "clang-format.style": "{ IndentWidth: 4, BasedOnStyle: google, AlignConsecutiveAssignments: true }",
+    "rest-client.environmentVariables": {
+        "$shared": {
+            "indexName": "coffee-index",
+        },
+        "local": {
+            "baseUrl": "http://admin:devpassword123!@localhost:9200",
+        },
+    }
 }

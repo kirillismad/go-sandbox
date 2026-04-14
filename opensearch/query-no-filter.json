@@ -1,0 +1,11 @@
+{
+    "size": 20,
+    "_source": {
+        "includes": [
+            "raw"
+        ]
+    },
+    "query": {
+        "match_all": {}
+    }
+}

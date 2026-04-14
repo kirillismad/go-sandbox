@@ -95,6 +95,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - ${POSTGRES_LOCAL_PORT}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test:
         [
@@ -112,3 +114,35 @@ services:
         limits:
           cpus: "0.4"
           memory: 512M
+
+  opensearch:
+    hostname: ${OPENSEARCH_HOST}
+    image: opensearchproject/opensearch:3
+    restart: unless-stopped
+    environment:
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+      DISABLE_SECURITY_PLUGIN: "true"
+      discovery.type: "single-node"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_PASSWORD}
+    ports:
+      - ${OPENSEARCH_LOCAL_PORT}:9200
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.3"
+          memory: 512M
+        limits:
+          cpus: "0.6"
+          memory: 1G
+
+volumes:
+  postgres_data:
+  opensearch_data:

@@ -4,3 +4,11 @@ tasks:
   init:
     cmds:
       - echo "Init"
+
+  create-csv:
+    cmds:
+      - go run ./opensearch/csvgen -n 100000 -out opensearch/coffee_items.csv
+
+  upload-csv:
+    cmds:
+      - "go run ./opensearch/csvupload -csv opensearch/coffee_items.csv -index coffee-index -addr http://localhost:9200 -batch-size 5000 -username admin -password devpassword123! -insecure"
